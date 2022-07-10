@@ -90,10 +90,12 @@
             console.log("Got notename: ", noteName);
 
             this.note = this.noteStore.getNote(noteName) as note;
-            if (this.note.content.length === 0)
-                this.addThought(this.note.name, "");
+            if (this.note) {
+                if (this.note.content.length === 0)
+                    this.addThought(this.note.name, "");
 
-            this.currentThoughtIndex = this.note.content.length - 1;
+                this.currentThoughtIndex = this.note.content.length - 1;
+            }
         },
         watch: {
             // * watch for thoughts (update/delete/create)

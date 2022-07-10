@@ -110,7 +110,11 @@
             focusThought()
             {
                 let myInput = this.$refs.currentThought as HTMLElement;
-                this.setEndOfContenteditable(myInput);
+
+                if (myInput.innerText.length > 0) {
+                    this.setEndOfContenteditable(myInput);
+                }
+                myInput.focus();
                 // place caret at the end of the text
             }
         },

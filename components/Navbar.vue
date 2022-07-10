@@ -5,10 +5,12 @@
             class="focus:outline-none focus:shadow-outline"
             @click="toggleSidebar"
             >
-            <MenuIcon v-if="!isSidebarOpen" class="h-5 w-5" aria-hidden="true" />
-            <ChevronDoubleLeftIcon v-else class="h-5 w-5" aria-hidden="true" />
+            <div class="hover:bg-blue-200 hover:bg-opacity-30 rounded-sm">
+                <MenuIcon v-if="!isSidebarOpen" class="h-5 w-5" aria-hidden="true" />
+                <ChevronDoubleLeftIcon ftIcon v-else class="h-5 w-5" aria-hidden="true" />
+            </div>
         </button>
-        <router-link to="/">
+        <router-link to="/" class="hover:bg-blue-200 hover:bg-opacity-30 rounded-sm">
             <HomeIcon class="h-5 w-5" aria-hidden="true" />
         </router-link>
     </div>
