@@ -3,6 +3,7 @@
         contenteditable="true"
         ref="currentThought"
         placeholder="Start typing something..."
+        @input="(evt:any) => handleInput(evt)"
         @keypress="(evt:any) => handleKeyPress(evt)"
         @keydown="(evt:any) => handleKeyDown(evt)"
         class="caret-white outline-none shadow-none">
@@ -42,6 +43,12 @@
         }
     });
 
+
+    let handleInput = ref((evt:any) => {
+        let newVal = evt.target.innerText;
+        noteStore.value.updateThought(props.noteName, props.thoughtIndex, newVal);
+    })
+
     let handleKeyDown = ref((evt:any) => {
 
         // left key, and right key can navigate thoughts
@@ -53,7 +60,6 @@
             noteStore.value.removeThought(props.noteName, props.thoughtIndex);
             return;
         }
-
     });
 
     let handleKeyPress = ref((evt:any) => {
@@ -79,8 +85,6 @@
             // this.$refs.commandList.focus();
             return;
         }
-
-        noteStore.value.updateThought(props.noteName, props.thoughtIndex, evt.target.innerText);
     });
 
     let currentVal = ref(props.initialVal);

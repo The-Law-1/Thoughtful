@@ -8,42 +8,39 @@
                 </span>
                 <ComboboxInput
                     class=" pl-12 w-full h-20 text-4xl rounded-lg outline-none border-none"
-                    :displayValue="(note:any) => note"
+                    :displayValue="(res:any) => displayValues(res)"
                     @change="query = $event.target.value" />
                 <ComboboxOptions
                     class="bg-white w-full max-h-[50vh] rounded-lg mt-1 text-left overflow-y-hidden">
-                    <ComboboxOption class="bg-teal-600 text-white" v-if="queryNote && filteredNotes.length === 0" :value="queryNote">
+
+                    <ComboboxOption class="bg-teal-600 text-white" v-if="searchMode === 'notes' && queryNote && filteredNotes.length === 0" :value="queryNote">
                         Press enter to create "{{ query }}"
                     </ComboboxOption>
 
                     <ComboboxOption
+                        v-if="searchMode === 'thoughts'"
+                        v-for="(thought, i) in filteredThoughts"
+                        as="template"
+                        v-slot="{ selected, active }"
+                        :key="'thought-' + i"
+                        :value="thought"
+                    >
+                        <SearchBarItem :active="active" :selected="selected" :displayVal="`${thought.text} - ${thought.note}`">
+
+                        </SearchBarItem>
+                    </ComboboxOption>
+
+                    <ComboboxOption
+                        v-if="searchMode === 'notes'"
                         v-for="note in filteredNotes"
                         as="template"
                         v-slot="{ selected, active }"
                         :key="note"
                         :value="note"
                     >
-                        <li
-                            class="relative cursor-default select-none py-2 pl-10 pr-4"
-                            :class="{
-                            'bg-teal-600 text-white': active,
-                            'text-gray-900': !active,
-                            }"
-                            >
-                            <span
-                                class="block truncate"
-                                :class="{ 'font-medium': selected, 'font-normal': !selected }"
-                                >
-                                {{ note }}
-                            </span>
-                            <span
-                                v-if="selected"
-                                class="absolute inset-y-0 left-0 flex items-center pl-3"
-                                :class="{ 'text-white': active, 'text-teal-600': !active }"
-                                >
-                                <CheckIcon class="h-5 w-5" aria-hidden="true" />
-                            </span>
-                        </li>
+                        <SearchBarItem :active="active" :selected="selected" :displayVal="note">
+
+                        </SearchBarItem>
                     </ComboboxOption>
                 </ComboboxOptions>
             </Combobox>
@@ -78,6 +75,7 @@
     let navBarStore = ref(useNavbarStore());
 
     let noteStore = useNoteStore();
+    var fullNotes = noteStore.list;
     var notes = noteStore.getNoteNames;
 
     const queryNote = computed(() => {
@@ -85,7 +83,35 @@
     })
 
     let selected = ref(notes[0])
-    let query = ref('')
+    let query = ref('');
+
+    let searchMode = ref('notes');
+
+    let filteredThoughts = computed(() => {
+        // also return the note name
+        let result = [] as any[];
+
+        let searchThreshold = 3;
+
+        if (searchMode.value !== 'thoughts' || query.value === '' || query.value.length < searchThreshold) {
+            return result;
+        }
+
+        fullNotes.forEach(note => {
+            note.content.forEach((thought) => {
+                if (thought.toLowerCase().includes(query.value.toLowerCase())) {
+                    result.push({ note: note.name, text: thought });
+                    return;
+                }
+                // return thought.includes(query.value);
+            });
+            if (result.length > 0) {
+                return;
+            }
+        });
+
+        return result;
+    });
 
     let filteredNotes = computed(() =>
     query.value === ''
@@ -98,21 +124,50 @@
         )
     );
 
+    let displayValues = (val:any) => {
+        if (!val)
+            return '';
+        if (searchMode.value === 'notes') {
+            return val;
+        }
+        return val.text;
+    }
+
     const router = useRouter();
+
+    watch(query, (newVal, oldVal) => {
+        let changedMode = false;
+        if (newVal === '/notes') {
+            searchMode.value = 'notes';
+            changedMode = true;
+        } else if (newVal === '/thoughts') {
+            searchMode.value = 'thoughts';
+            changedMode = true;
+        }
+
+        if (changedMode) {
+            selected.value = "";
+            query.value = "";
+        }
+    });
 
     watch(noteStore.list, () => {
         notes = noteStore.getNoteNames
     });
 
-    watch(selected, async (newValue:string) => {
-        if (newValue === null)
+    watch(selected, async (newValue:any) => {
+        if (newValue === null || newValue.length === 0)
             return;
 
-        if (!notes.includes(newValue)) {
-            console.log("create", newValue);
-            noteStore.addNote(newValue);
+        if (searchMode.value === 'notes') {
+            if (!notes.includes(newValue)) {
+                console.log("create", newValue);
+                noteStore.addNote(newValue);
+            }
+            // route object with query parameters
+            router.push({ path: "/note", query: { noteName:(newValue as string) } });
+        } else if (searchMode.value === 'thoughts') {
+            router.push({ path: "/note", query: { noteName: (newValue.note as string) } });
         }
-        // route object with query parameters
-        router.push({ path: "/note", query: { noteName: newValue } });
     })
 </script>
