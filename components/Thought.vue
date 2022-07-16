@@ -3,11 +3,13 @@
         contenteditable="true"
         ref="currentThought"
         placeholder="Start typing something..."
+        @click="(evt:any) => setEndOfContenteditable(evt.target)"
+        @dblclick="(evt:any) => highlightThought(evt)"
         @input="(evt:any) => handleInput(evt)"
         @keypress="(evt:any) => handleKeyPress(evt)"
         @keydown="(evt:any) => handleKeyDown(evt)"
-        class="caret-white outline-none shadow-none">
-        {{ currentVal }}
+        class="caret-white outline-none shadow-none"
+        v-html="currentVal">
     </div>
 </template>
 
@@ -43,11 +45,13 @@
         }
     });
 
+    let currentVal = ref(props.initialVal);
+
 
     let handleInput = ref((evt:any) => {
         let newVal = evt.target.innerText;
         noteStore.value.updateThought(props.noteName, props.thoughtIndex, newVal);
-    })
+    });
 
     let handleKeyDown = ref((evt:any) => {
 
@@ -72,6 +76,9 @@
             // remove trailing newline
             
             let val = evt.target.innerText.trim();
+
+            currentVal.value = val;
+
             evt.target.innerText = val;
             if (val.length > 0) {
                 // add the thought to the store
@@ -87,7 +94,11 @@
         }
     });
 
-    let currentVal = ref(props.initialVal);
+    let highlightThought = ref((evt:any) => {
+        document.getSelection()?.selectAllChildren(evt.target);
+        // document.getSelection().selectAllChildren(event.target)
+    });
+
 
 </script>
 
@@ -124,6 +135,7 @@
         },
         created: function() {
             console.log("Created thought: ", this.thoughtIndex);
+
             this.$nextTick(() => {
                 this.focusThought();
             })

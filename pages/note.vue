@@ -57,8 +57,10 @@
         methods: {
             ...mapActions(useNoteStore, ["addThought"]),
             clickThought(i:Number) {
-                this.currentThoughtIndex = i;
-                this.focusTrigger++;
+                if (this.currentThoughtIndex !== i) {
+                    this.currentThoughtIndex = i;
+                    this.focusTrigger++;
+                }
             },
             addThoughtElement(evt:any)
             {
@@ -68,8 +70,8 @@
 
                 // if the last thought is not empty:
                 // add an empty thought
-                console.log("this.note.content.length", this.note.content);
-                console.log("Last content: ", this.note.content[this.note.content.length - 1]);
+                // console.log("this.note.content.length", this.note.content);
+                // console.log("Last content: ", this.note.content[this.note.content.length - 1]);
 
                 if (this.note.content.length === 0) {
                     this.addThought(this.note.name, "");

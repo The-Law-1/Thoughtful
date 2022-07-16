@@ -32,7 +32,7 @@ export const useNoteStore = defineStore('notes', {
     updateThought(noteName:string, thoughtIdx:number, thought:string) {
         let note = this.$state.list.find((note) => note.name === noteName);
         if (note) {
-            console.log("Set thought to :", thought);
+            // console.log("Set thought to :", thought);
 
             note.content[thoughtIdx] = thought;
         }
