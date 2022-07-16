@@ -1,10 +1,15 @@
 <template>
     <div class="pt-20 w-full flex justify-around" :class="navBarStore.sidebarOpen ? 'pl-[20rem]' : 'pl-0'">
         <div class="w-[50%] h-20 rounded-lg">
-            <div v-if="selectedNote"
-                class="bg-slate-500 text-3xl opacity-50 cursor-pointer"
-                @click="() => navigateToSelected()">
-                In {{ selectedNote }}:
+            <div v-if="selectedNote.length > 0" class="flex bg-slate-400 justify-between rounded-lg">
+                <div
+                    class="text-3xl opacity-50 cursor-pointer hover:underline"
+                    @click="() => navigateToSelected()">
+                    In {{ selectedNote }}:
+                </div>
+                <span class="cursor-pointer" @click="() => selectedNote = ''" >
+                    <XIcon class="w-6 h-6"></XIcon>
+                </span>
             </div>
             <div class="bg-white rounded-lg">
                 <Combobox v-model="selected" nullable>
@@ -53,7 +58,7 @@
     ComboboxOption,
     TransitionRoot,
     } from '@headlessui/vue'
-    import { SearchIcon, CheckIcon, SelectorIcon } from '@heroicons/vue/solid';
+    import { SearchIcon, CheckIcon, SelectorIcon, XIcon } from '@heroicons/vue/solid';
     import { useRouter } from "vue-router";
 
     let navBarStore = ref(useNavbarStore());
@@ -82,17 +87,26 @@
         return val;
     }
 
+    var filterResults = async (searchQuery:string) => {
+        console.log("Searching: ", searchQuery);
+
+        if (selectedNote.value.length > 0) {
+            filteredResults.value = await searchStore.fetchThoughtFilterResults(searchQuery, selectedNote.value);
+        } else {
+            filteredResults.value = await searchStore.fetchNoteFilterResults(searchQuery);
+        }
+        // filteredResults.value = notes.filter(note => note.toLowerCase().includes(newVal.toLowerCase()));
+    }
 
     watch(query, (newVal, oldVal) => {
         if (newVal.length > 0) {
             if (currentSearchTimeout !== null) {
                 clearTimeout(currentSearchTimeout);
             }
-            currentSearchTimeout = setTimeout(async () => {
-                console.log("Searching: ", newVal);
 
-                filteredResults.value = await searchStore.fetchNoteFilterResults(newVal);
-                // filteredResults.value = notes.filter(note => note.toLowerCase().includes(newVal.toLowerCase()));
+            currentSearchTimeout = setTimeout(async () => {
+                filterResults(newVal);
+
                 currentSearchTimeout = null;
             }, 400);
         }
