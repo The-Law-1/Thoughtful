@@ -15,11 +15,13 @@
                 <Thought
                     v-for="(thought, i) in note.content"
                     @click="() => clickThought(i)"
+                    @focusThought="(idx) => focusThought(idx)"
                     :ref="'thought-'+ i"
-                    :key="i"
+                    :key="`${thought.id}-${i}`"
                     :focus-trigger="i === currentThoughtIndex ? 1 + focusTrigger : 0"
                     :note-name="note.name"
-                    :initial-val="thought"
+                    :thought-id="thought.id"
+                    :initial-val="thought.content"
                     :thought-index="i"/>
             </div>
         </div>
@@ -56,8 +58,16 @@
         },
         methods: {
             ...mapActions(useNoteStore, ["addThought"]),
+            focusThought(idx:number) {
+                if (idx >= 0 && idx < this.note.content.length) {
+                    console.log("focus: Focusing thought at index: ", idx);
+                    this.currentThoughtIndex = idx;
+                    this.focusTrigger++;
+                }
+            },
             clickThought(i:Number) {
                 if (this.currentThoughtIndex !== i) {
+                    console.log("click: Focusing thought at index: ", i);
                     this.currentThoughtIndex = i;
                     this.focusTrigger++;
                 }
@@ -76,7 +86,7 @@
                 if (this.note.content.length === 0) {
                     this.addThought(this.note.name, "");
                 }
-                if (this.note.content.length > 0 && this.note.content[this.note.content.length - 1].length > 0) {
+                if (this.note.content.length > 0 && this.note.content[this.note.content.length - 1].content.length > 0) {
                     this.addThought(this.note.name, "");
                 }
 
@@ -104,13 +114,13 @@
             noteStore: {
                 handler(newVal) {
                     this.note = newVal.getNote(this.note.name) as note;
-                    // console.log("Updated store: ", this.note);
+                    console.log("Updated store: ", this.note);
 
                     // focus last thought
-                    if (this.note && this.note.content.length > 0) {
-                        this.currentThoughtIndex = this.note.content.length - 1;
-                        this.focusTrigger++;
-                    }
+                    // if (this.note && this.note.content.length > 0) {
+                    //     this.currentThoughtIndex = this.note.content.length - 1;
+                    //     this.focusTrigger++;
+                    // }
                 },
                 deep: true,
             },

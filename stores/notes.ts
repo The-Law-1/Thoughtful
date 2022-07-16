@@ -13,6 +13,9 @@ export const useNoteStore = defineStore('notes', {
   // could also be defined as
   // state: () => ({ count: 0 })
   actions: {
+    generateRandomID() {
+        return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    },
     addNote(title:string = "") {
         this.$state.list.push({name: title, content: [], emoji: ""});
     },
@@ -23,18 +26,30 @@ export const useNoteStore = defineStore('notes', {
         }
     },
 
+    insertThought(noteName:string, index:number, thought:string) {
+        let note = this.$state.list.find((note) => note.name === noteName);
+        if (note) {
+            let newThought = {content: thought, id: this.generateRandomID()};
+            if (index === note.content.length) {
+                note.content.push(newThought);
+            } else {
+                note.content.splice(index, 0, newThought);
+            }
+        }
+    },
+
     addThought(noteName:string, thought:string) {
         let note = this.$state.list.find((note) => note.name === noteName);
         if (note) {
-            note.content.push(thought);
+            let newThought = {content: thought, id: this.generateRandomID()};
+
+            note.content.push(newThought);
         }
     },
     updateThought(noteName:string, thoughtIdx:number, thought:string) {
         let note = this.$state.list.find((note) => note.name === noteName);
-        if (note) {
-            // console.log("Set thought to :", thought);
-
-            note.content[thoughtIdx] = thought;
+        if (note && note.content[thoughtIdx]) {
+            note.content[thoughtIdx].content = thought;
         }
     },
     removeThought(noteName:string, thoughtIdx:number) {

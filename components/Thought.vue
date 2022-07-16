@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
     import { useNoteStore } from "@/stores/notes";
-    import { ref, computed, watch, defineComponent } from 'vue';
+    import { ref, computed, watch, defineComponent, nextTick } from 'vue';
 
     let noteStore = ref(useNoteStore());
 
@@ -35,6 +35,10 @@
             type: Number,
             default: 0,
         },
+        thoughtId: {
+            type: String,
+            required: true,
+        },
         thoughtIndex: {
             type: Number,
             required: true,
@@ -45,12 +49,28 @@
         }
     });
 
+    const emit = defineEmits<{
+        (event: 'focusThought', idx:number): void
+    }>();
+
     let currentVal = ref(props.initialVal);
 
+    let saveTimeout = null as any;
+    let currentSaveID = "";
 
     let handleInput = ref((evt:any) => {
         let newVal = evt.target.innerText;
-        noteStore.value.updateThought(props.noteName, props.thoughtIndex, newVal);
+
+        if (saveTimeout) {
+            clearTimeout(saveTimeout);
+        }
+        currentSaveID = props.thoughtId;
+        saveTimeout = setTimeout(() => {
+            // * only update if we're sure it's the same thought, no glitching
+            if (currentSaveID === props.thoughtId) {
+                noteStore.value.updateThought(props.noteName, props.thoughtIndex, newVal);
+            }
+        }, 500);
     });
 
     let handleKeyDown = ref((evt:any) => {
@@ -60,8 +80,11 @@
         // * pressed backspace
         if (evt.key === "Backspace" && evt.target.innerText.length === 0) {
             evt.preventDefault();
-            console.log("Pressed backspace");
+            console.log("Removing thought at index: ", props.thoughtIndex);
             noteStore.value.removeThought(props.noteName, props.thoughtIndex);
+
+            // * tell notes to focus their last thought
+            emit("focusThought", props.thoughtIndex - 1);
             return;
         }
     });
@@ -81,11 +104,16 @@
 
             evt.target.innerText = val;
             if (val.length > 0) {
-                // add the thought to the store
-                // add an empty thought
                 noteStore.value.updateThought(props.noteName, props.thoughtIndex, val);
             }
-            noteStore.value.addThought(props.noteName, '');
+            console.log("Inserting thought at index: ", props.thoughtIndex + 1);
+            noteStore.value.insertThought(props.noteName, props.thoughtIndex + 1, "");
+
+            // * wait for new thought to appear
+            nextTick(() => {
+                emit("focusThought", props.thoughtIndex + 1);
+            });
+            // noteStore.value.addThought(props.noteName, '');
             return;
         }
         if (evt.key === '/') {
@@ -134,11 +162,13 @@
             }
         },
         created: function() {
-            console.log("Created thought: ", this.thoughtIndex);
 
-            this.$nextTick(() => {
-                this.focusThought();
-            })
+            if (this.initialVal.length === 0) {
+                this.$nextTick(() => {
+                    // console.log("On created: focusing thought at index: ", this.thoughtIndex);
+                    // this.focusThought();
+                });
+            }
         },
         watch: {
             focusTrigger: function(newVal) {
