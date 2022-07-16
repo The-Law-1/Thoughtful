@@ -95,7 +95,6 @@
         } else {
             filteredResults.value = await searchStore.fetchNoteFilterResults(searchQuery);
         }
-        // filteredResults.value = notes.filter(note => note.toLowerCase().includes(newVal.toLowerCase()));
     }
 
     watch(query, (newVal, oldVal) => {
@@ -119,12 +118,11 @@
         if (filteredResults.value.includes(newValue)) {
             console.log("create", newValue);
             noteStore.addNote(newValue);
+            router.push({ path: "/note", query: { noteName:(newValue as string) } });
         }
 
         // * select the note for filtering
         selectedNote.value = newValue;
 
-        // route object with query parameters
-        // router.push({ path: "/note", query: { noteName:(newValue as string) } });
     });
 </script>
