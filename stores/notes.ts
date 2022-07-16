@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import { defineStore } from 'pinia';
 
 export const useNoteStore = defineStore('notes', {
   state: () => {
@@ -44,11 +44,12 @@ export const useNoteStore = defineStore('notes', {
         }
     },
     async fetchNotes() {
-        let placeHolders = await $fetch("https://jsonplaceholder.typicode.com/posts");
+        // let placeHolders = await $fetch("https://jsonplaceholder.typicode.com/posts");
+        let placeHolders = await $fetch("https://jsonplaceholder.typicode.com/users");
 
         if (placeHolders) {
             (placeHolders as any[]).forEach(placeHolder => {
-                this.$state.list.push({ name: placeHolder.title, content: [], emoji: "" });
+                this.$state.list.push({ name: placeHolder.company.name, content: [], emoji: "" });
             });
         }
     }
