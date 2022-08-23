@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia';
+import { defineStore, acceptHMRUpdate } from 'pinia';
 
 
 export const useSearchStore = defineStore('search', {
@@ -18,6 +18,9 @@ export const useSearchStore = defineStore('search', {
                 "thoughts"
             ];
         },
+        async fetchThoughtInAllNotes(query:string) {
+            return ["Gabriel", "Chris", "Lucy", "Charlie", "Toto"];
+        },
         async fetchNoteFilterResults(query:string) {
             // let placeHolders = await $fetch("https://jsonplaceholder.typicode.com/posts");
             let placeHolders = await $fetch("https://jsonplaceholder.typicode.com/users");
@@ -35,4 +38,9 @@ export const useSearchStore = defineStore('search', {
         },
       
     },
-  })
+})
+
+// make sure to pass the right store definition, `useAuth` in this case.
+if (import.meta.hot) {
+    import.meta.hot.accept(acceptHMRUpdate(useSearchStore, import.meta.hot))
+}
