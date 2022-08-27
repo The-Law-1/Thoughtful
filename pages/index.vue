@@ -3,13 +3,15 @@
         <!-- flexgrid with all the tools -->
         <component v-if="currentToolIdx !== -1" :is="tools[currentToolIdx].component">
         </component>
-        <div class="flex">
-            <div
-                v-for="(tool, i) in tools"
-                :key="'tool-btn-' + i"
-                @click="toolSelected(i)"
-                class="w-20 bg-gray-200 hover:bg-gray-300 cursor-pointer">
-                {{ tool.label }}
+        <div class="flex justify-center">
+            <div class="w-[50%] flex justify-around pt-20" :class="currentToolIdx !== -1 ? '' : 'mt-[160px]'">
+                <div
+                    v-for="(tool, i) in tools"
+                    :key="'tool-btn-' + i"
+                    @click="toolSelected(i)"
+                    class="rounded-lg w-32 h-16 flex align-center justify-center items-center bg-gray-200 hover:bg-gray-300 cursor-pointer">
+                    {{ tool.label }}
+                </div>
             </div>
         </div>
     </div>
@@ -37,11 +39,9 @@
     // * can you access this in the html ? Or does it need to be ref() ?
     var toolSelected = (idx: number) => {
         currentToolIdx.value = idx;
-        console.log("Current tool selected: ", tools.value[idx].label);
+        // console.log("Current tool selected: ", tools.value[idx].label);
     }
 
-
-    // return noteStore;
 </script>
 
 <script lang="ts">
