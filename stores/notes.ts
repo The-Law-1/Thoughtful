@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia';
 
+// ! this whole store could become obsolete, it's meant for local demo
+
 export const useNoteStore = defineStore('notes', {
   state: () => {
     return { 
@@ -17,7 +19,7 @@ export const useNoteStore = defineStore('notes', {
         return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     },
     addNote(title:string = "") {
-        this.$state.list.push({name: title, content: [], emoji: ""});
+        this.$state.list.push({id: this.generateRandomID(), name: title, content: [], emoji: ""});
     },
     removeNote(noteName:string) {
         let noteIdx = this.$state.list.findIndex((note) => note.name === noteName);
@@ -25,11 +27,10 @@ export const useNoteStore = defineStore('notes', {
             this.$state.list.splice(noteIdx, 1);
         }
     },
-
     insertThought(noteName:string, index:number, thought:string) {
         let note = this.$state.list.find((note) => note.name === noteName);
         if (note) {
-            let newThought = {content: thought, id: this.generateRandomID()};
+            let newThought = {content: thought, id: this.generateRandomID(), noteParent: noteName};
             if (index === note.content.length) {
                 note.content.push(newThought);
             } else {
@@ -37,11 +38,10 @@ export const useNoteStore = defineStore('notes', {
             }
         }
     },
-
     addThought(noteName:string, thought:string) {
         let note = this.$state.list.find((note) => note.name === noteName);
         if (note) {
-            let newThought = {content: thought, id: this.generateRandomID()};
+            let newThought = {content: thought, id: this.generateRandomID(), noteParent: noteName};
 
             note.content.push(newThought);
         }
@@ -64,7 +64,7 @@ export const useNoteStore = defineStore('notes', {
 
         if (placeHolders) {
             (placeHolders as any[]).forEach(placeHolder => {
-                this.$state.list.push({ name: placeHolder.company.name, content: [], emoji: "" });
+                this.$state.list.push({ id: this.generateRandomID(), name: placeHolder.company.name, content: [], emoji: "" });
             });
         }
     }

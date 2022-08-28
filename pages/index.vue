@@ -1,9 +1,13 @@
 <template>
     <div>
         <!-- flexgrid with all the tools -->
-        <component v-if="currentToolIdx !== -1" :is="tools[currentToolIdx].component">
+        <!-- TODO add all the props here, the functions -->
+        <component v-if="currentToolIdx !== -1" :is="tools[currentToolIdx].component"
+            :placeholder="tools[currentToolIdx].placeholder"
+            :noResultsMessage="tools[currentToolIdx].noResultsPlaceholder">
         </component>
         <div class="flex justify-center">
+            <!-- Tools grid -->
             <div class="w-[50%] flex justify-around pt-20" :class="currentToolIdx !== -1 ? '' : 'mt-[160px]'">
                 <div
                     v-for="(tool, i) in tools"
@@ -20,21 +24,34 @@
 
 <script setup lang="ts">
     import { useNoteStore } from "@/stores/notes";
+    import { useSearchStore } from "@/stores/search";
     import { LightningBoltIcon } from '@heroicons/vue/solid';
     import { resolveComponent, ref, markRaw } from "vue";
 
     const SearchBar = markRaw(resolveComponent('SearchBar') as any);
 
-    // TODO bring everything into setup because I can't access SearchBar!
-    let noteStore = ref(useNoteStore() as any);
+    // let noteStore = ref(useNoteStore() as any);
+    let noteStore = useNoteStore() as any;
+    let searchStore = useSearchStore() as any;
+
     let currentToolIdx = ref(-1 as number);
     let tools = ref([] as any[]);
     // TODO you might want to store this in the backend ?
+    // ! we need a better way to store this, backend, frontend idk but this is really bad
     // TODO icons will have to be installed locally and store the path, can't be bothered to install a heroicons package
     // browse thoughts,
-    tools.value.push({ icon: "", label: "Thoughts", onSearch: null, onSelected: null, noResultsPlaceholder: "Not found in thoughts, create: ", placeholder: "Search thoughts", enabled: false, component: SearchBar });
+    tools.value.push({ hotkey: 'T', icon: "", label: "Thoughts", displayFunc: (thoughtObj: thought) => thoughtObj.content, onSearch: searchStore.fetchThought, onSelected: searchStore.thoughtSelected, noResultsPlaceholder: "Not found in thoughts, create: ", placeholder: "Search thoughts", enabled: false, component: SearchBar });
     // browse notes
-    tools.value.push({ icon: "", label: "Notes", onSearch: null, onSelected: null, noResultsPlaceholder: "Not found in notes, create: ", placeholder: "Search notes", enabled: false, component: SearchBar });
+    tools.value.push({ hotkey: 'N', icon: "", label: "Notes", displayFunc: (noteObj: note) => noteObj.name, onSearch: searchStore.fetchNote, onSelected: searchStore.noteSelected, noResultsPlaceholder: "Not found in notes, create: ", placeholder: "Search notes", enabled: false, component: SearchBar });
+
+    // * sort of stupid because ctrl+T & ctrl+N are existing shortcuts
+    // * we could use ctrl+K but that's all
+    var handleHotkeys = (evt: any) => {
+        // * you need to prevent default for the event to prevent the browser from doing its own thing
+        console.log("Can handle hotkeys here. Ctrl key is: " + evt.ctrlKey);
+    }
+    window.addEventListener("keypress", handleHotkeys);
+
 
     // * can you access this in the html ? Or does it need to be ref() ?
     var toolSelected = (idx: number) => {

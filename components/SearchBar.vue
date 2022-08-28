@@ -61,6 +61,18 @@
             type: String,
             default: 'Search',
         },
+        onSearchFunction: {
+            type: Function,
+            default: () => [],
+        },
+        onSelectedFunction: {
+            type: Function,
+            default: () => [],
+        },
+        displayValFunction: {
+            type: Function,
+            default: () => "",
+        }
     });
 
     const emit = defineEmits<{
@@ -90,22 +102,13 @@
     // });
 
     let displayValues = (val:any) => {
-        return val;
+        return props.displayValFunction(val);
     }
 
     var filterResults = async (searchQuery:string) => {
         console.log("Searching: ", searchQuery);
 
-        filteredResults.value = await searchStore.fetchThoughtInAllNotes(searchQuery);
-
-        // TODO emit event "onSearch"
-        emit('onSearch', searchQuery);
-
-        // if (selectedResult.value.length > 0) {
-        //     filteredResults.value = await searchStore.fetchThoughtFilterResults(searchQuery, selectedResult.value);
-        // } else {
-        //     filteredResults.value = await searchStore.fetchNoteFilterResults(searchQuery);
-        // }
+        filteredResults.value = props.onSearchFunction(searchQuery);
     }
 
     watch(query, (newVal, oldVal) => {
@@ -128,9 +131,14 @@
             return;
 
         console.log("Selected new option: ", newValue);
-
-        // TODO emit event "onSelected"
-        emit('onSelected', newValue);
+        // TODO probably better to find an item using its ID
+        if (filteredResults.value.includes(newValue)) {
+            // add options to navigate to item
+            props.onSelectedFunction(newValue, router);
+        } else {
+            // * just call on selected otherwise (likely it will create something)
+            props.onSelectedFunction(newValue);
+        }
         
         // if (filteredResults.value.includes(newValue)) {
         //     console.log("create", newValue);
