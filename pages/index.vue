@@ -3,8 +3,11 @@
         <!-- flexgrid with all the tools -->
         <!-- TODO add all the props here, the functions -->
         <component v-if="currentToolIdx !== -1" :is="tools[currentToolIdx].component"
+            :noResultsMessage="tools[currentToolIdx].noResultsPlaceholder"
             :placeholder="tools[currentToolIdx].placeholder"
-            :noResultsMessage="tools[currentToolIdx].noResultsPlaceholder">
+            :onSearchFunction="tools[currentToolIdx].onSearch"
+            :onSelectedFunction="tools[currentToolIdx].onSelected"
+            :displayValFunction="tools[currentToolIdx].displayFunc">
         </component>
         <div class="flex justify-center">
             <!-- Tools grid -->
@@ -44,16 +47,14 @@
     // browse notes
     tools.value.push({ hotkey: 'N', icon: "", label: "Notes", displayFunc: (noteObj: note) => noteObj.name, onSearch: searchStore.fetchNote, onSelected: searchStore.noteSelected, noResultsPlaceholder: "Not found in notes, create: ", placeholder: "Search notes", enabled: false, component: SearchBar });
 
-    // * sort of stupid because ctrl+T & ctrl+N are existing shortcuts
-    // * we could use ctrl+K but that's all
+    // ! sort of stupid because ctrl+T & ctrl+N are existing shortcuts
+    // ! we could use ctrl+K but that's all
     var handleHotkeys = (evt: any) => {
         // * you need to prevent default for the event to prevent the browser from doing its own thing
         console.log("Can handle hotkeys here. Ctrl key is: " + evt.ctrlKey);
     }
     window.addEventListener("keypress", handleHotkeys);
 
-
-    // * can you access this in the html ? Or does it need to be ref() ?
     var toolSelected = (idx: number) => {
         currentToolIdx.value = idx;
         // console.log("Current tool selected: ", tools.value[idx].label);

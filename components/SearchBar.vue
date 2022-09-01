@@ -25,7 +25,7 @@
                             :key="'thought-' + i"
                             :value="searchResult"
                         >
-                            <SearchBarItem :active="active" :selected="selected" :displayVal="`${searchResult}`">
+                            <SearchBarItem :active="active" :selected="selected" :displayVal="displayValues(searchResult)">
 
                             </SearchBarItem>
                         </ComboboxOption>
@@ -101,14 +101,21 @@
     //     router.push({ path: "/note", query: { noteName:(selectedResult.value as string) } });
     // });
 
+    // ! tough on performance to have such a routine function be a prop, but let's trust vue to optimize it
     let displayValues = (val:any) => {
-        return props.displayValFunction(val);
+        if (val !== null) {
+            // console.log("Calling display value for value: ", val);
+            return props.displayValFunction(val);
+        } else {
+            return "";
+        }
     }
 
     var filterResults = async (searchQuery:string) => {
         console.log("Searching: ", searchQuery);
 
-        filteredResults.value = props.onSearchFunction(searchQuery);
+        filteredResults.value = await props.onSearchFunction(searchQuery);
+        console.log("Got filteredResults: ", filteredResults.value);
     }
 
     watch(query, (newVal, oldVal) => {
@@ -134,10 +141,10 @@
         // TODO probably better to find an item using its ID
         if (filteredResults.value.includes(newValue)) {
             // add options to navigate to item
-            props.onSelectedFunction(newValue, router);
+            await props.onSelectedFunction(newValue, router);
         } else {
             // * just call on selected otherwise (likely it will create something)
-            props.onSelectedFunction(newValue);
+            await props.onSelectedFunction(newValue);
         }
         
         // if (filteredResults.value.includes(newValue)) {
