@@ -97,10 +97,6 @@
 
     const router = useRouter();
 
-    // var navigateToSelected = ref(() => {
-    //     router.push({ path: "/note", query: { noteName:(selectedResult.value as string) } });
-    // });
-
     // ! tough on performance to have such a routine function be a prop, but let's trust vue to optimize it
     let displayValues = (val:any) => {
         if (val !== null) {
@@ -138,22 +134,9 @@
             return;
 
         console.log("Selected new option: ", newValue);
-        // TODO probably better to find an item using its ID
-        if (filteredResults.value.includes(newValue)) {
-            // add options to navigate to item
-            await props.onSelectedFunction(newValue, router);
-        } else {
-            // * just call on selected otherwise (likely it will create something)
-            await props.onSelectedFunction(newValue);
-        }
-        
-        // if (filteredResults.value.includes(newValue)) {
-        //     console.log("create", newValue);
-        //     noteStore.addNote(newValue);
-        //     router.push({ path: "/note", query: { noteName:(newValue as string) } });
-        // }
 
-        // * select the note for filtering
-        // selectedResult.value = newValue;
+        // TODO if this returns a string, open the component with according name
+        props.onSelectedFunction(newValue, router);
+
     });
 </script>

@@ -1,7 +1,6 @@
 <template>
     <div>
         <!-- flexgrid with all the tools -->
-        <!-- TODO add all the props here, the functions -->
         <component v-if="currentToolIdx !== -1" :is="tools[currentToolIdx].component"
             :noResultsMessage="tools[currentToolIdx].noResultsPlaceholder"
             :placeholder="tools[currentToolIdx].placeholder"

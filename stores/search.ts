@@ -20,33 +20,40 @@ export const useSearchStore = defineStore('search', {
         },
         async fetchThought(query:string) : Promise<thought[]> {
             // TODO call the backend to find a thought with the query
-            return [ { id: "1", content: "test", noteParent: "note"} ];
+            // return [ { id: "1", content: "test", noteParent: "note"} ];
+            return [];
         },
         async fetchNote(query:string) : Promise<note[]> {
             // TODO call the backend to find a note with the query
 
             return [ { id: "1", content: [], name: "note", emoji: ""} ];
         },
-        async noteSelected(noteObj:note, router: any = null) {
+        // ! noteObj could be a string if we're creating a new one
+        async noteSelected(noteObj:any, router: any = null) {
 
-            if (router) {
+            if (typeof noteObj === "string") {
+                // TODO call the backend to create a new note
+                console.log("Calling the backend to create note: ", noteObj);
+            } else {
                 console.log("Navigating to note: ", noteObj.name);
                 // router.push({ path: "/note", query: { noteName:(newValue as string) } });
-            } else {
-                // TODO call the backend to create a new note
-                console.log("Calling the backend to create note: ", noteObj.name);
             }
         },
-        async thoughtSelected(thoughtObj:thought, router: any = null) {
+        // ! thoughtObj could be a string if we're creating a new one
+        async thoughtSelected(thoughtObj:any, router: any = null) {
 
-            if (router) {
+            if (typeof thoughtObj === "string") {
+                // TODO in this case we want to ask the user what note he would like to add the thought to, so open a modal with another search bar, this time with different functions
+                // TODO return the name of your modal, i.e. "NewThoughtModal" which will take care of the rest, just pass it the current query (thought)
+            } else {
                 console.log("Navigating to note containing thought: ", thoughtObj.content);
                 // router.push({ path: "/note", query: { noteName:(newValue as string) } });
-            } else {
-                // TODO in this case we want to ask the user what note he would like to add the thought to, so open a modal with another search bar, this time with different functions
-                // TODO call the backend to create a new thought
-                console.log("Calling the backend to create thought: ", thoughtObj.content);
             }
+        },
+        async addThoughtToNote(thoughtContent: string, parentNote: string) {
+
+            // TODO call the backend to add the thought to the note
+            console.log("Calling the backend to add thought to note: ", thoughtContent, parentNote);
         }
     },
 })
