@@ -46,6 +46,7 @@
     // browse notes
     tools.value.push({ hotkey: 'N', icon: "", label: "Notes", displayFunc: (noteObj: note) => noteObj.name, onSearch: searchStore.fetchNote, onSelected: searchStore.noteSelected, noResultsPlaceholder: "Not found in notes, create: ", placeholder: "Search notes", enabled: false, component: SearchBar });
 
+
     // ! sort of stupid because ctrl+T & ctrl+N are existing shortcuts
     // ! we could use ctrl+K but that's all
     var handleHotkeys = (evt: any) => {

@@ -1,39 +1,44 @@
 <template>
-    <div class="pt-20 w-full flex justify-around" :class="navBarStore.sidebarOpen ? 'pl-[20rem]' : 'pl-0'">
-        <div class="w-[50%] h-20 rounded-lg">
-            <div class="bg-white rounded-lg">
-                <Combobox v-model="selectedOption" nullable>
-                    <span>
-                        <SearchIcon class="absolute mt-5 w-12 h-12"></SearchIcon>
-                    </span>
-                    <ComboboxInput
-                        class=" pl-12 w-full h-20 text-4xl rounded-lg outline-none border-none"
-                        :placeholder="placeholder"
-                        :displayValue="(res:any) => displayValues(res)"
-                        @change="query = $event.target.value" />
-                    <ComboboxOptions
-                        class="bg-white w-full max-h-[50vh] rounded-lg mt-1 text-left overflow-y-hidden">
+    <main>
+        <component v-if="submenuComponent !== null" :is="submenuComponent" :currentOption="selectedOption"></component>
 
-                        <ComboboxOption class="bg-teal-600 text-white" v-if="queryVal && filteredResults.length === 0" :value="queryVal">
-                            {{ noResultsMessage }} "{{ query }}"
-                        </ComboboxOption>
+        <div class="pt-20 w-full flex justify-around" :class="navBarStore.sidebarOpen ? 'pl-[20rem]' : 'pl-0'">
+            <div class="w-[50%] h-20 rounded-lg">
+                <div class="bg-white rounded-lg">
+                    <Combobox v-model="selectedOption" nullable>
+                        <span>
+                            <SearchIcon class="absolute mt-5 w-12 h-12"></SearchIcon>
+                        </span>
+                        <ComboboxInput
+                            class=" pl-12 w-full h-20 text-4xl rounded-lg outline-none border-none"
+                            :placeholder="placeholder"
+                            :displayValue="(res:any) => displayValues(res)"
+                            @change="query = $event.target.value" />
+                        <ComboboxOptions
+                            class="bg-white w-full max-h-[50vh] rounded-lg mt-1 text-left overflow-y-hidden">
 
-                        <ComboboxOption
-                            v-for="(searchResult, i) in filteredResults"
-                            as="template"
-                            v-slot="{ selected, active }"
-                            :key="'thought-' + i"
-                            :value="searchResult"
-                        >
-                            <SearchBarItem :active="active" :selected="selected" :displayVal="displayValues(searchResult)">
+                            <ComboboxOption class="bg-teal-600 text-white" v-if="queryVal && filteredResults.length === 0" :value="queryVal">
+                                {{ noResultsMessage }} "{{ query }}"
+                            </ComboboxOption>
 
-                            </SearchBarItem>
-                        </ComboboxOption>
-                    </ComboboxOptions>
-                </Combobox>
+                            <ComboboxOption
+                                v-for="(searchResult, i) in filteredResults"
+                                as="template"
+                                v-slot="{ selected, active }"
+                                :key="'thought-' + i"
+                                :value="searchResult"
+                            >
+                            <!-- TODO on selected doesn't fire when you click manually -->
+                                <SearchBarItem :active="active" :selected="selected" :displayVal="displayValues(searchResult)">
+
+                                </SearchBarItem>
+                            </ComboboxOption>
+                        </ComboboxOptions>
+                    </Combobox>
+                </div>
             </div>
         </div>
-    </div>
+    </main>
 </template>
 
 <script setup lang="ts">
@@ -51,6 +56,7 @@
     } from '@headlessui/vue'
     import { SearchIcon, CheckIcon, SelectorIcon, XIcon } from '@heroicons/vue/solid';
     import { useRouter } from "vue-router";
+    import NewThoughtModal from "@/components/NewThoughtModal.vue";
 
     const props = defineProps({
         noResultsMessage: {
@@ -92,6 +98,8 @@
 
     let selectedOption = ref("");
     let query = ref('');
+
+    let submenuComponent = ref(null as any);
 
     var currentSearchTimeout = null as any;
 
@@ -135,8 +143,8 @@
 
         console.log("Selected new option: ", newValue);
 
-        // TODO if this returns a string, open the component with according name
-        props.onSelectedFunction(newValue, router);
-
+        let modalSubmenu = await props.onSelectedFunction(newValue, router);
+        // TODO update a ref with this value
+        submenuComponent.value = modalSubmenu;
     });
 </script>
