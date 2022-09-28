@@ -66,6 +66,10 @@
     
     const isOpen = ref(true);
 
+    const emit = defineEmits<{
+        (event: 'close'): void
+    }>();
+
     let props = defineProps({
         thought: {
             type: String,
@@ -75,6 +79,8 @@
     
     function closeModal() {
         isOpen.value = false;
+
+        emit("close");
     }
   </script>
   

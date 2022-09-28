@@ -42,9 +42,9 @@
     // ! we need a better way to store this, backend, frontend idk but this is really bad
     // TODO icons will have to be installed locally and store the path, can't be bothered to install a heroicons package
     // browse thoughts,
-    tools.value.push({ hotkey: 'T', icon: "", label: "Thoughts", displayFunc: (thoughtObj: thought) => thoughtObj.content, onSearch: searchStore.fetchThought, onSelected: searchStore.thoughtSelected, noResultsPlaceholder: "Not found in thoughts, create: ", placeholder: "Search thoughts", enabled: false, component: SearchBar });
+    tools.value.push({ hotkey: 'T', icon: "", label: "Thoughts", displayFunc: (thoughtObj: thought) => thoughtObj.content, onSearch: searchStore.fetchThought, onSelected: searchStore.thoughtSelected, noResultsPlaceholder: "Press enter to create thought: ", placeholder: "Search thoughts", enabled: false, component: SearchBar });
     // browse notes
-    tools.value.push({ hotkey: 'N', icon: "", label: "Notes", displayFunc: (noteObj: note) => noteObj.name, onSearch: searchStore.fetchNote, onSelected: searchStore.noteSelected, noResultsPlaceholder: "Not found in notes, create: ", placeholder: "Search notes", enabled: false, component: SearchBar });
+    tools.value.push({ hotkey: 'N', icon: "", label: "Notes", displayFunc: (noteObj: note) => noteObj.name, onSearch: searchStore.fetchNote, onSelected: searchStore.noteSelected, noResultsPlaceholder: "Press enter to create note: ", placeholder: "Search notes", enabled: false, component: SearchBar });
 
 
     // ! sort of stupid because ctrl+T & ctrl+N are existing shortcuts

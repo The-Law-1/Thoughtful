@@ -1,6 +1,6 @@
 <template>
     <main>
-        <component v-if="submenuComponent !== null" :is="submenuComponent" :currentOption="selectedOption"></component>
+        <component v-if="submenuComponent !== null" @close="submenuComponent = null" :is="submenuComponent" :currentOption="selectedOption"></component>
 
         <div class="pt-20 w-full flex justify-around" :class="navBarStore.sidebarOpen ? 'pl-[20rem]' : 'pl-0'">
             <div class="w-[50%] h-20 rounded-lg">
@@ -10,6 +10,7 @@
                             <SearchIcon class="absolute mt-5 w-12 h-12"></SearchIcon>
                         </span>
                         <ComboboxInput
+                            autocomplete="off"
                             class=" pl-12 w-full h-20 text-4xl rounded-lg outline-none border-none"
                             :placeholder="placeholder"
                             :displayValue="(res:any) => displayValues(res)"
@@ -25,10 +26,9 @@
                                 v-for="(searchResult, i) in filteredResults"
                                 as="template"
                                 v-slot="{ selected, active }"
-                                :key="'thought-' + i"
+                                :key="'search-result-' + i"
                                 :value="searchResult"
                             >
-                            <!-- TODO on selected doesn't fire when you click manually -->
                                 <SearchBarItem :active="active" :selected="selected" :displayVal="displayValues(searchResult)">
 
                                 </SearchBarItem>
@@ -45,7 +45,7 @@
     import { useNoteStore } from "@/stores/notes";
     import { useSearchStore } from "@/stores/search";
     import { useNavbarStore } from "@/stores/navbar";
-    import { ref, computed, watch } from 'vue'
+    import { ref, computed, watch, shallowRef } from 'vue'
     import {
     Combobox,
     ComboboxInput,
@@ -99,7 +99,7 @@
     let selectedOption = ref("");
     let query = ref('');
 
-    let submenuComponent = ref(null as any);
+    let submenuComponent = shallowRef(null as any);
 
     var currentSearchTimeout = null as any;
 
@@ -136,15 +136,18 @@
         }
     });
 
+    var onSelected = async (newValue:any) => {
+        console.log("Selected new option: ", newValue);
+
+        let modalSubmenu = await props.onSelectedFunction(newValue, router);
+        submenuComponent.value = modalSubmenu;
+    }
+
     // * selected something new
     watch(selectedOption, async (newValue:any) => {
         if (newValue === null || newValue.length === 0)
             return;
 
-        console.log("Selected new option: ", newValue);
-
-        let modalSubmenu = await props.onSelectedFunction(newValue, router);
-        // TODO update a ref with this value
-        submenuComponent.value = modalSubmenu;
+        await onSelected(newValue);
     });
 </script>

@@ -30,7 +30,8 @@ export const useSearchStore = defineStore('search', {
             // TODO call the backend to find a note with the query
 
             alert("Searching the backend for a note by query: " + query);
-            return [ { id: "1", content: [], name: "note", emoji: ""} ];
+            // return [ { id: "1", content: [], name: "note", emoji: ""} ];
+            return [];
         },
         // ! noteObj could be a string if we're creating a new one
         async noteSelected(noteObj:any, router: any = null) {
