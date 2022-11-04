@@ -37,6 +37,7 @@
     import { resolveComponent, ref, markRaw } from "vue";
 
     const ThoughtSearchBar = markRaw(resolveComponent('ThoughtSearchBar') as any);
+    const NoteSearchBar = markRaw(resolveComponent('NoteSearchBar') as any);
 
     // let noteStore = ref(useNoteStore() as any);
     let noteStore = useNoteStore() as any;
@@ -46,7 +47,9 @@
     let tools = ref([] as any[]);
 
     // TODO make a component for note search bar
-    tools.value.push({ component: ThoughtSearchBar, label: "Thoughts" })
+    tools.value.push({ component: ThoughtSearchBar, label: "Thoughts" });
+    tools.value.push({ component: NoteSearchBar, label: "Notes" });
+
     // tools.value.push({ hotkey: 'T', icon: "", label: "Thoughts", displayFunc: (thoughtObj: thought) => thoughtObj.content, onSearch: searchStore.fetchThought, onSelected: searchStore.thoughtSelected, noResultsPlaceholder: "Press enter to create thought: ", placeholder: "Search thoughts", enabled: false, component: SearchBar });
     // browse notes
     // tools.value.push({ hotkey: 'N', icon: "", label: "Notes", displayFunc: (noteObj: note) => noteObj.name, onSearch: searchStore.fetchNote, onSelected: searchStore.noteSelected, noResultsPlaceholder: "Press enter to create note: ", placeholder: "Search notes", enabled: false, component: SearchBar });
