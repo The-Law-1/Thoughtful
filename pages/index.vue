@@ -1,13 +1,19 @@
 <template>
     <div>
-        <!-- flexgrid with all the tools -->
-        <component v-if="currentToolIdx !== -1" :is="tools[currentToolIdx].component"
+        <!-- TODO make individual components which don't need this many props (thoughtsearchbar + notesearchbar)
+            you can still use the <component is="..."> approach but they should be able to stand alone and not have an insane object to initialize them
+            it'll also make the searchbar components more concise and this index page more readable -->
+        <!-- <component v-if="currentToolIdx !== -1" :is="tools[currentToolIdx].component"
             :noResultsMessage="tools[currentToolIdx].noResultsPlaceholder"
             :placeholder="tools[currentToolIdx].placeholder"
             :onSearchFunction="tools[currentToolIdx].onSearch"
             :onSelectedFunction="tools[currentToolIdx].onSelected"
             :displayValFunction="tools[currentToolIdx].displayFunc">
-        </component>
+        </component> -->
+
+        <component v-if="currentToolIdx !== -1" :is="tools[currentToolIdx].component"></component>
+
+        <!-- flexgrid with all the tools -->
         <div class="flex justify-center">
             <!-- Tools grid -->
             <div class="w-[50%] flex justify-around pt-20" :class="currentToolIdx !== -1 ? '' : 'mt-[160px]'">
@@ -30,7 +36,7 @@
     import { LightningBoltIcon } from '@heroicons/vue/solid';
     import { resolveComponent, ref, markRaw } from "vue";
 
-    const SearchBar = markRaw(resolveComponent('SearchBar') as any);
+    const ThoughtSearchBar = markRaw(resolveComponent('ThoughtSearchBar') as any);
 
     // let noteStore = ref(useNoteStore() as any);
     let noteStore = useNoteStore() as any;
@@ -38,13 +44,12 @@
 
     let currentToolIdx = ref(-1 as number);
     let tools = ref([] as any[]);
-    // TODO you might want to store this in the backend ?
-    // ! we need a better way to store this, backend, frontend idk but this is really bad
-    // TODO icons will have to be installed locally and store the path, can't be bothered to install a heroicons package
-    // browse thoughts,
-    tools.value.push({ hotkey: 'T', icon: "", label: "Thoughts", displayFunc: (thoughtObj: thought) => thoughtObj.content, onSearch: searchStore.fetchThought, onSelected: searchStore.thoughtSelected, noResultsPlaceholder: "Press enter to create thought: ", placeholder: "Search thoughts", enabled: false, component: SearchBar });
+
+    // TODO make a component for note search bar
+    tools.value.push({ component: ThoughtSearchBar, label: "Thoughts" })
+    // tools.value.push({ hotkey: 'T', icon: "", label: "Thoughts", displayFunc: (thoughtObj: thought) => thoughtObj.content, onSearch: searchStore.fetchThought, onSelected: searchStore.thoughtSelected, noResultsPlaceholder: "Press enter to create thought: ", placeholder: "Search thoughts", enabled: false, component: SearchBar });
     // browse notes
-    tools.value.push({ hotkey: 'N', icon: "", label: "Notes", displayFunc: (noteObj: note) => noteObj.name, onSearch: searchStore.fetchNote, onSelected: searchStore.noteSelected, noResultsPlaceholder: "Press enter to create note: ", placeholder: "Search notes", enabled: false, component: SearchBar });
+    // tools.value.push({ hotkey: 'N', icon: "", label: "Notes", displayFunc: (noteObj: note) => noteObj.name, onSearch: searchStore.fetchNote, onSelected: searchStore.noteSelected, noResultsPlaceholder: "Press enter to create note: ", placeholder: "Search notes", enabled: false, component: SearchBar });
 
 
     // ! sort of stupid because ctrl+T & ctrl+N are existing shortcuts
