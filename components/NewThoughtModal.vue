@@ -33,18 +33,24 @@
                   as="h3"
                   class="text-lg font-medium leading-6 text-gray-900"
                 >
-                    Write to...
+                    Write {{ props.thought }} to...
                 </DialogTitle>
 
-                <DialogDescription>
-                    {{ props.thought}}
-                </DialogDescription>
+                <!-- <DialogDescription>
+                    {{ props.thought }}
+                </DialogDescription> -->
 
                 <div class="mt-2">
-                  <p class="text-sm text-gray-500">
-                    Here probably a dropdown with all the notes
-                  </p>
+                    <p class="text-sm text-gray-500">
+                    </p>
                 </div>
+                <GenericCombobox
+                    :placeholder="'Search notes'"
+                    :searchFunction="filterResults"
+                    @optionSelected="onSelected"
+                    :displayValues="(val:note) => (val as note) === null ? '' : val.name"
+                    >
+                </GenericCombobox>
               </DialogPanel>
             </TransitionChild>
           </div>
@@ -63,7 +69,13 @@
         DialogDescription,
         DialogTitle,
     } from '@headlessui/vue'
-    
+    import NoteSearchBar from './NoteSearchBar.vue';
+    import { useNoteStore } from "@/stores/notes";
+    import { useSearchStore } from "@/stores/search";
+ 
+    let searchStore = useSearchStore();
+    let noteStore = useNoteStore();
+
     const isOpen = ref(true);
 
     const emit = defineEmits<{
@@ -76,6 +88,19 @@
             default: () => "",
         },
     });
+    
+    var filterResults = async (searchQuery:string) : Promise<note[]> => {
+        console.log("Searching: ", searchQuery);
+
+        var newResults = await searchStore.fetchNote(searchQuery);
+        console.log("Got filteredResults: ", newResults);
+        return newResults;
+    }
+
+    var onSelected = async (newValue:any) => {
+        await noteStore.addThought(newValue, props.thought);
+        closeModal();
+    }
     
     function closeModal() {
         isOpen.value = false;

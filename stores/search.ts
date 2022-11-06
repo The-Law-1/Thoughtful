@@ -22,14 +22,14 @@ export const useSearchStore = defineStore('search', {
         async fetchThought(query:string) : Promise<thought[]> {
             // TODO call the backend to find a thought with the query
 
-            alert("Searching the backend for a thought by query: " + query);
+            // alert("Searching the backend for a thought by query: " + query);
             // return [ { id: "1", content: "test", noteParent: "note"} ];
             return [];
         },
         async fetchNote(query:string) : Promise<note[]> {
             // TODO call the backend to find a note with the query
 
-            alert("Searching the backend for a note by query: " + query);
+            // alert("Searching the backend for a note by query: " + query);
             // return [ { id: "1", content: [], name: "note", emoji: ""} ];
             return [];
         },

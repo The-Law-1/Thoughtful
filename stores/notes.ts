@@ -19,15 +19,24 @@ export const useNoteStore = defineStore('notes', {
         return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     },
     addNote(title:string = "") {
+        // TODO call the backend, then update the state
+
         this.$state.list.push({id: this.generateRandomID(), name: title, content: [], emoji: ""});
+
     },
     removeNote(noteName:string) {
+
+        // TODO call the backend, then update the state
+
         let noteIdx = this.$state.list.findIndex((note) => note.name === noteName);
         if (noteIdx > -1) {
             this.$state.list.splice(noteIdx, 1);
         }
     },
     insertThought(noteName:string, index:number, thought:string) {
+
+        // TODO call the backend, then update the state if successful
+
         let note = this.$state.list.find((note) => note.name === noteName);
         if (note) {
             let newThought = {content: thought, id: this.generateRandomID(), noteParent: noteName};
@@ -38,7 +47,9 @@ export const useNoteStore = defineStore('notes', {
             }
         }
     },
-    addThought(noteName:string, thought:string) {
+    async addThought(noteName:string, thought:string) {        
+        // TODO call the backend, update the list
+
         let note = this.$state.list.find((note) => note.name === noteName);
         if (note) {
             let newThought = {content: thought, id: this.generateRandomID(), noteParent: noteName};
@@ -47,12 +58,16 @@ export const useNoteStore = defineStore('notes', {
         }
     },
     updateThought(noteName:string, thoughtIdx:number, thought:string) {
+        // TODO call the backend, update the list
+
         let note = this.$state.list.find((note) => note.name === noteName);
         if (note && note.content[thoughtIdx]) {
             note.content[thoughtIdx].content = thought;
         }
     },
     removeThought(noteName:string, thoughtIdx:number) {
+        // TODO call the backend, update the list
+
         let note = this.$state.list.find((note) => note.name === noteName);
         if (note) {
             note.content.splice(thoughtIdx, 1);

@@ -2,7 +2,7 @@
     <main>
         <!-- not exactly required to use the generic component here but it's future-proof I suppose, in case you want to add something else
          -->
-        <component v-if="submenuComponent !== null" @close="submenuComponent = null" :is="submenuComponent" :currentOption="selectedOption"></component>
+        <component v-if="submenuComponent !== null" @close="submenuComponent = null" :is="submenuComponent" :thought="selectedOption"></component>
 
         <div class="pt-20 w-full flex justify-around" :class="navBarStore.sidebarOpen ? 'pl-[20rem]' : 'pl-0'">
             <div class="w-[50%] h-20 rounded-lg">
@@ -11,7 +11,7 @@
                     <GenericCombobox
                         :placeholder="'Search thoughts'"
                         :searchFunction="filterResults"
-                        @optionSelected="onSelected"
+                        @onSelected="onSelected"
                         :displayValues="(val:thought) => (val as thought) === null ? '' : val.content"
                         >
                     </GenericCombobox>
@@ -53,8 +53,7 @@
         // let modalSubmenu = await props.onSelectedFunction(newValue, router);
         let modalSubmenu = await searchStore.thoughtSelected(newValue, router);
         
-        if (modalSubmenu === null)
-            selectedOption.value = newValue;
+        selectedOption.value = newValue;
 
         submenuComponent.value = modalSubmenu;
     }
