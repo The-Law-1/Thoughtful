@@ -20,11 +20,21 @@ export class CatsController {
 
     constructor(private readonly CatsService: CatsService) {}
 
+    /**
+     * Get all cats
+     * @param request 
+     * @returns a list of cats
+     */
 	@Get()
 	async findAll(@Req() request: Request): Promise<Cat[]> {
         return await this.CatsService.FindAll();
 	}
 
+    /**
+     * Creates a cat
+     * @param createCatObject 
+     * @returns the created cat
+     */
 	@Post()
 	@HttpCode(201)
 	@Header("Cache-Control", "none") // not exactly useful
@@ -32,11 +42,21 @@ export class CatsController {
         return await this.CatsService.create(createCatObject);
 	}
 
+    /**
+     * Find a cat by its ID
+     * @param idParam cat ID
+     * @returns A cat
+     */
 	@Get(":id")
 	async findOne(@Param("id") idParam: string): Promise<Cat> {
         return await this.CatsService.GetOne(idParam);
 	}
 
+    /**
+     * Delete a cat by its ID
+     * @param idParam cat ID
+     * @returns Success/failure
+     */
 	@Delete(":id")
     @HttpCode(204)
 	async remove(@Param("id") idParam: string): Promise<string> {
