@@ -8,8 +8,7 @@ import { CatsModule } from "./cats/cats.module";
 import { CatSchema } from "./cats/schemas/cat.schema";
 
 @Module({
-    // ! I have no clue if this URL is correct
-	imports: [MongooseModule.forRoot("mongodb://root:root@localhost:27017/thoughtful"), CatsModule],
+	imports: [MongooseModule.forRoot("mongodb://root:root@localhost:27017", {dbName: "Thoughtful"}), CatsModule],
 	controllers: [AppController],
 	providers: [AppService],
 })
