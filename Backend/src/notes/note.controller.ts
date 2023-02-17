@@ -32,7 +32,7 @@ export class NoteController {
      * @param title Title filter
      * @returns A list of notes
      */
-    @Get(":title")
+    @Get("filter/:title")
     async findAllByTitle(@Param("title") title: string): Promise<Note[]> {
         return this.noteService.FindAllByTitle(title);
     }

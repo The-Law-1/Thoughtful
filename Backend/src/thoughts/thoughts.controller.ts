@@ -35,7 +35,7 @@ export class ThoughtsController {
      * @param search Content search
      * @returns A list of thoughts
      */
-    @Get(":search")
+    @Get("filter/:search")
     async findAllByContent(@Param("search") search: string): Promise<Thought[]> {
         return this.thoughtsService.FindAllByContent(search);
     }
@@ -46,7 +46,7 @@ export class ThoughtsController {
      * @returns A thought
      */
     @Get(":id")
-    async findOne(@Param("id") idParam: string): Promise<Thought> {
+    async GetOne(@Param("id") idParam: string): Promise<Thought> {
         return this.thoughtsService.GetOne(idParam);
     }
 
