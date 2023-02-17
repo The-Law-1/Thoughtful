@@ -5,7 +5,7 @@ import { CreateNoteDto } from "./dto/create-note.dto";
 import { Note, NoteDocument } from "./schemas/note.schema";
 
 @Injectable()
-export class NotesService {
+export class NoteService {
     constructor(@InjectModel(Note.name) private noteModel: Model<NoteDocument>) {}
 
     async create(createNoteDto: CreateNoteDto): Promise<Note> {

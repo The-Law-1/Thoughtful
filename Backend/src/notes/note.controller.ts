@@ -1,11 +1,11 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post } from "@nestjs/common";
 import { CreateNoteDto } from "./dto/create-note.dto";
-import { NotesService } from "./note.service";
+import { NoteService } from "./note.service";
 import { Note } from "./schemas/note.schema";
 
 @Controller("notes")
 export class NoteController {
-    constructor(private readonly noteService: NotesService) {}
+    constructor(private readonly noteService: NoteService) {}
 
     /**
      * Create a new note
