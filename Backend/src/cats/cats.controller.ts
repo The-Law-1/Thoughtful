@@ -15,7 +15,7 @@ import { CatsService } from "./cats.service";
 import { Cat } from "./schemas/cat.schema";
 
 // host means you can only access this controller if you are on localhost
-@Controller({ path: "cats", host: "localhost" })
+@Controller({ path: "cats" /*, host: "localhost" */ })
 export class CatsController {
 
     constructor(private readonly CatsService: CatsService) {}

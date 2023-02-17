@@ -1,6 +1,6 @@
-import { Model, Types } from "mongoose";
+import mongoose, { Model, Types } from "mongoose";
 import { Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
+import { InjectModel, Schema } from "@nestjs/mongoose";
 import { Thought, ThoughtDocument } from "./schemas/thought.schema";
 import { CreateThoughtDto } from "./dto/create-thought.dto";
 
@@ -16,8 +16,11 @@ export class ThoughtsService {
             // create a new note
             // add the noteId to the thought
             // save the thought
+            createdThought.noteId = new Types.ObjectId();
         }
-        return createdThought.save();
+        createdThought.save();
+
+        return createdThought;
     }
 
     // I hardly see a use for this but you never know
@@ -33,29 +36,16 @@ export class ThoughtsService {
         return this.thoughtModel.find({content: {$regex: content, $options: "i"}}).exec();
     }
 
-    // get all thoughts for a note
-    async GetThoughtsForNoteId(noteId: string): Promise<Thought[]> {
-        return this.thoughtModel.find({noteId: noteId}).exec();
-    }
-
     // get
     async GetOne(id: string): Promise<Thought> {
         return this.thoughtModel.findById(id).exec();
     }
 
     // delete one
-    async DeleteOne(id: string): Promise<boolean> {
-        const thought = this.thoughtModel.findById(id).exec();
-        if (thought === null) {
-            return false;
-        }
+    async DeleteOne(id: string): Promise<Thought> {
+        const thought = await this.thoughtModel.findByIdAndRemove({_id: id}).exec();
 
-        const deletedResult = await thought.delete().exec();
-
-        if (deletedResult.deletedCount === 1) {
-            return true;
-        }
-        return false;
+        return thought;
     }
 
 }
