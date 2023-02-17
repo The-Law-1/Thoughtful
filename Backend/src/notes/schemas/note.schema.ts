@@ -5,7 +5,7 @@ import { Thought } from 'src/types/thought';
 export type NoteDocument = HydratedDocument<Note>;
 
 export class Note {
-    @Prop()
+    @Prop({default: "Untitled"})
     title: string;
 
     @Prop()
