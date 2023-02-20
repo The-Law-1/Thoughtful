@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put } from "@nestjs/common";
+import { Types } from "mongoose";
 import { CreateNoteDto } from "./dto/create-note.dto";
 import { NoteService } from "./note.service";
 import { Note } from "./schemas/note.schema";
@@ -67,6 +68,20 @@ export class NoteController {
     @Patch(":id")
     @HttpCode(204)
     async updateOne(@Param("id") idParam: string, @Body() createNoteDto: CreateNoteDto): Promise<Note> {
-        return this.noteService.UpdateOne(idParam, createNoteDto);
+        // url decode id?
+        // decodeURIComponent(idParam);
+        return this.noteService.UpdateOne(new Types.ObjectId(idParam), createNoteDto);
+    }
+
+    /**
+     * Rename a note
+     * @param idParam id of the note to rename
+     * @param newTitle new title of the note
+     * @returns updated note
+     */
+    @Put("rename/:id/:title")
+    @HttpCode(204)
+    async renameOne(@Param("id") idParam: string, @Param("title") newTitle: string): Promise<Note> {
+        return this.noteService.RenameNote(new Types.ObjectId(idParam), newTitle);
     }
 }

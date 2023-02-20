@@ -1,4 +1,7 @@
+import mongoose from "mongoose";
+
 export class Thought {
+    _id: mongoose.Types.ObjectId;
     content: string;
-    noteId: string; // it's a ref to a note, so not quite sure what to do here
+    noteId: mongoose.Types.ObjectId;
 }
