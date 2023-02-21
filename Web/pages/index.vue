@@ -10,22 +10,22 @@
             :onSelectedFunction="tools[currentToolIdx].onSelected"
             :displayValFunction="tools[currentToolIdx].displayFunc">
         </component> -->
-
-        <component v-if="currentToolIdx !== -1" :is="tools[currentToolIdx].component"></component>
-
+        
         <!-- flexgrid with all the tools -->
         <div class="flex justify-center">
             <!-- Tools grid -->
-            <div class="w-[50%] flex justify-around pt-20" :class="currentToolIdx !== -1 ? '' : 'mt-[160px]'">
+            <div class="w-[50%] flex h-16 items-end" :class="currentToolIdx !== -1 ? '' : 'mt-[160px]'">
                 <div
                     v-for="(tool, i) in tools"
                     :key="'tool-btn-' + i"
                     @click="toolSelected(i)"
-                    class="rounded-lg w-32 h-16 flex align-center justify-center items-center bg-gray-200 hover:bg-gray-300 cursor-pointer">
+                    class="rounded-lg w-32 h-8 hover:h-16 flex align-center justify-center items-center bg-gray-200 hover:bg-gray-300 cursor-pointer">
                     {{ tool.label }}
                 </div>
             </div>
         </div>
+        <component v-if="currentToolIdx !== -1" :is="tools[currentToolIdx].component"></component>
+
     </div>
 
 </template>
