@@ -43,7 +43,7 @@
     let noteStore = useNoteStore() as any;
     let searchStore = useSearchStore() as any;
 
-    let currentToolIdx = ref(-1 as number);
+    let currentToolIdx = ref(0);
     let tools = ref([] as any[]);
 
     // TODO make a component for note search bar
