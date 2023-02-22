@@ -14,12 +14,13 @@
         <!-- flexgrid with all the tools -->
         <div class="flex justify-center">
             <!-- Tools grid -->
-            <div class="w-[50%] flex h-16 items-end" :class="currentToolIdx !== -1 ? '' : 'mt-[160px]'">
+            <div class="w-[50%] pl-2 flex h-16 items-end" :class="currentToolIdx !== -1 ? '' : 'mt-[160px]'">
                 <div
                     v-for="(tool, i) in tools"
                     :key="'tool-btn-' + i"
                     @click="toolSelected(i)"
-                    class="rounded-lg w-32 h-8 hover:h-16 flex align-center justify-center items-center bg-gray-200 hover:bg-gray-300 cursor-pointer">
+                    :class="currentToolIdx === i ? 'bg-gray-400 h-10' : 'bg-gray-200 h-8'"
+                    class="rounded-t-lg w-32 transition-all ease-in-out duration-150 hover:h-16 flex align-center justify-center items-center cursor-pointer">
                     {{ tool.label }}
                 </div>
             </div>
