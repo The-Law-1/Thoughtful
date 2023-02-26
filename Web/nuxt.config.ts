@@ -6,9 +6,19 @@ export default defineNuxtConfig({
     //     transpile: ['@headless-ui/vue']
     // },
     ssr: false,
-    modules: ['@nuxtjs/tailwindcss'],
+    modules: [
+        '@nuxtjs/tailwindcss',
+        '@nuxtjs/proxy',
+        ],
     components: true,
     buildModules: [
         '@pinia/nuxt',
     ],
+    proxy: {
+        '/api': {
+            target: process.env.BACKEND_URL || "http://localhost:8081",
+            pathRewrite: { "/api": "" }, // try ^/api ?
+            ws: true },
+
+    }
 });

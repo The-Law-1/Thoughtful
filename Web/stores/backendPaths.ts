@@ -9,6 +9,31 @@ function safeJsonParse(str: string) {
 export default class BackendPath {
     // either you make a proxy or not, if you don't, this will read from environment variable
     static readonly BASE_URL: string = "/api";
+
+    public static Auth = class {
+        static readonly PATH: string = `${BackendPath.BASE_URL}/auth`;
+
+        // you could make a type for the access_token object
+        public static async Login(password: string): Promise<any> {
+            const path = `${this.PATH}/login`;
+
+            const res = await fetch(path, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ password }),
+            });
+            if (!res.ok) {
+                const data = await res.text();
+                return Promise.reject({
+                    name: `${res.status}`,
+                    message: data ? safeJsonParse(data) ?? data : null,
+                } as Error);
+            }
+            return await res.text();
+        }
+    }
   
     // public static Admin = class {
     //   static readonly PATH: string = `${BackendPath.BASE_URL}/admin`;
