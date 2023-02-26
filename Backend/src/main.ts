@@ -10,6 +10,7 @@ async function bootstrap() {
 		.setDescription("The Thoughtful API description")
 		.setVersion("1.0")
 		.addTag("thoughtful")
+        .addBearerAuth()
 		.build();
 
 	const document = SwaggerModule.createDocument(app, config);
