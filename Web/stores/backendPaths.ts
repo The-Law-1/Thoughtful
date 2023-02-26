@@ -180,70 +180,92 @@ export default class BackendPath {
             return await res.json();
         }
     }
-  
-    // public static Admin = class {
-    //   static readonly PATH: string = `${BackendPath.BASE_URL}/admin`;
-  
-    //   public static async GetUsers(token: string): Promise<User[]> {
-    //     const path = `${this.PATH}/user`;
-  
-    //     const res = await fetch(path, {
-    //       method: "GET",
-    //       headers: {
-    //         Authorization: `Bearer ${token}`,
-    //       },
-    //     });
-    //     if (!res.ok) {
-    //       const data = await res.text();
-    //       return Promise.reject({
-    //         name: `${res.status}`,
-    //         message: data ? safeJsonParse(data) ?? data : null,
-    //       } as Error);
-    //     }
-    //     return await res.json();
-    //   }
-  
-    //   public static async GetUser(userId: string, token: string): Promise<User> {
-    //     const path = `${this.PATH}/user/${encodeURIComponent(userId)}`;
-  
-    //     const res = await fetch(path, {
-    //       method: "GET",
-    //       headers: {
-    //         Authorization: `Bearer ${token}`,
-    //       },
-    //     });
-    //     if (!res.ok) {
-    //       const data = await res.text();
-    //       return Promise.reject({
-    //         name: `${res.status}`,
-    //         message: data ? safeJsonParse(data) ?? data : null,
-    //       } as Error);
-    //     }
-    //     return await res.json();
-    //   }
-  
-    //   public static async DeleteUser(
-    //     userId: string,
-    //     token: string
-    //   ): Promise<void> {
-    //     const path = `${this.PATH}/user/${encodeURIComponent(userId)}`;
-  
-    //     const res = await fetch(path, {
-    //       method: "DELETE",
-    //       headers: {
-    //         Authorization: `Bearer ${token}`,
-    //       },
-    //     });
-    //     if (!res.ok) {
-    //       const data = await res.text();
-    //       return Promise.reject({
-    //         name: `${res.status}`,
-    //         message: data ? safeJsonParse(data) ?? data : null,
-    //       } as Error);
-    //     }
-    //     return Promise.resolve();
-    //   }
-    // };
+
+    public static Thoughts = class {
+        static readonly PATH: string = `${BackendPath.BASE_URL}/thoughts`;
+
+        public static async CreateThought(token: string, newThought: thought): Promise<thought> {
+            const path = `${this.PATH}`;
+
+            const res = await fetch(path, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ content: newThought.content, noteId: newThought.noteId }),
+            });
+            if (!res.ok) {
+                const data = await res.text();
+                return Promise.reject({
+                    name: `${res.status}`,
+                    message: data ? safeJsonParse(data) ?? data : null,
+                } as Error);
+            }
+            return await res.json();
+        }
+
+        public static async GetThoughts(token: string): Promise<thought[]> {
+            const path = `${this.PATH}`;
+
+            const res = await fetch(path, {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            if (!res.ok) {
+                const data = await res.text();
+                return Promise.reject({
+                    name: `${res.status}`,
+                    message: data ? safeJsonParse(data) ?? data : null,
+                } as Error);
+            }
+            return await res.json();
+        }
+
+        public static async GetThoughtById(token: string, thoughtId: string): Promise<thought> {
+            const path = `${this.PATH}/${thoughtId}`;
+
+            const res = await fetch(path, {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            if (!res.ok) {
+                const data = await res.text();
+                return Promise.reject({
+                    name: `${res.status}`,
+                    message: data ? safeJsonParse(data) ?? data : null,
+                } as Error);
+            }
+            return await res.json();
+        }
+
+        public static async GetThoughtsByContent(token: string, content: string): Promise<thought[]> {
+            const path = `${this.PATH}/filter/${content}`;
+
+            const res = await fetch(path, {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            if (!res.ok) {
+                const data = await res.text();
+                return Promise.reject({
+                    name: `${res.status}`,
+                    message: data ? safeJsonParse(data) ?? data : null,
+                } as Error);
+            }
+            return await res.json();
+        }
+
+        // get by id
+
+        // delete by id
+    }
 
 }
     
