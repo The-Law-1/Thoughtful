@@ -1,5 +1,7 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, UseGuards } from "@nestjs/common";
+import { ApiBearerAuth } from "@nestjs/swagger";
 import { Types } from "mongoose";
+import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { CreateNoteDto } from "./dto/create-note.dto";
 import { NoteService } from "./note.service";
 import { Note } from "./schemas/note.schema";
@@ -13,6 +15,8 @@ export class NoteController {
      * @param createNoteDto create note object.
      * @returns Note
      */
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
     @Post()
     @HttpCode(201)
     async create(@Body() createNoteDto: CreateNoteDto): Promise<Note> {
@@ -23,6 +27,8 @@ export class NoteController {
      * Find all notes
      * @returns All notes
      */
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
     @Get()
     async findAll(): Promise<Note[]> {
         return this.noteService.FindAll();
@@ -33,6 +39,8 @@ export class NoteController {
      * @param title Title filter
      * @returns A list of notes
      */
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
     @Get("filter/:title")
     async findAllByTitle(@Param("title") title: string): Promise<Note[]> {
         return this.noteService.FindAllByTitle(title);
@@ -43,6 +51,8 @@ export class NoteController {
      * @param idParam Note ID
      * @returns A note
      */
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
     @Get(":id")
     async findOne(@Param("id") idParam: string): Promise<Note> {
         return this.noteService.GetOne(idParam);
@@ -53,6 +63,8 @@ export class NoteController {
      * @param idParam Note ID
      * @returns Deleted note
      */
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
     @Delete(":id")
     @HttpCode(204)
     async deleteOne(@Param("id") idParam: string): Promise<Note> {
@@ -65,6 +77,8 @@ export class NoteController {
      * @param createNoteDto update note object
      * @returns updated note
      */
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
     @Patch(":id")
     @HttpCode(204)
     async updateOne(@Param("id") idParam: string, @Body() createNoteDto: CreateNoteDto): Promise<Note> {
@@ -79,6 +93,8 @@ export class NoteController {
      * @param newTitle new title of the note
      * @returns updated note
      */
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
     @Put("rename/:id/:title")
     @HttpCode(204)
     async renameOne(@Param("id") idParam: string, @Param("title") newTitle: string): Promise<Note> {
