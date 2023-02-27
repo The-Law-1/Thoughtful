@@ -262,9 +262,24 @@ export default class BackendPath {
             return await res.json();
         }
 
-        // get by id
+        public static async DeleteThoughtById(token: string, thoughtId: string): Promise<thought> {
+            const path = `${this.PATH}/${thoughtId}`;
 
-        // delete by id
+            const res = await fetch(path, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            if (!res.ok) {
+                const data = await res.text();
+                return Promise.reject({
+                    name: `${res.status}`,
+                    message: data ? safeJsonParse(data) ?? data : null,
+                } as Error);
+            }
+            return await res.json();
+        }
     }
 
 }
