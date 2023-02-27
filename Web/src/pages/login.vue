@@ -11,13 +11,21 @@
 
 <script lang="ts" setup>
     import { ref } from 'vue';
+    import { useAuthStore } from "@/stores/auth";
+
+    let authStore = useAuthStore();
 
     let password = ref("")
 
     let submitPassword = ref((e:any) => {
         e.preventDefault();
         // redirect to tools page maybe but definitely don't refresh my page
-        alert("You submitted password " + password.value);
+        // alert("You submitted password " + password.value);
+
+        authStore.testApi();
+        // authStore.login(password.value);
+
+        // authStore.testStorage("Test value for storage");
     });
 
 </script>

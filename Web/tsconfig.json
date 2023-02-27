@@ -1,42 +1,12 @@
 {
-    "types": [
-        "@pinia/nuxt"
-    ],
-    "compilerOptions": {
-      "target": "esnext",
-      "module": "es2022",
-      "strict": true,
-      "jsx": "preserve",
-      "moduleResolution": "node",
-      "esModuleInterop": true,
-      "allowSyntheticDefaultImports": true,
-      "forceConsistentCasingInFileNames": true,
-      "useDefineForClassFields": true,
-      "sourceMap": true,
-      "baseUrl": ".",
-    //   "types": [
-    //     "webpack-env"
-    //   ],
-      "paths": {
-        "@/*": [
-          "./*"
-        ]
+    "files": [],
+    "references": [
+      {
+        "path": "./tsconfig.config.json"
       },
-      "lib": [
-        "esnext",
-        "dom",
-        "dom.iterable",
-        "scripthost"
-      ]
-    },
-    // "include": [
-    //   "src/**/*.ts",
-    //   "src/**/*.tsx",
-    //   "src/**/*.vue",
-    //   "tests/**/*.ts",
-    //   "tests/**/*.tsx"
-    // ],
-    // "exclude": [
-    //   "node_modules"
-    // ]
-  }
+      {
+        "path": "./tsconfig.app.json"
+      },
+    ]
+}
+  

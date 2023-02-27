@@ -1,3 +1,6 @@
+import { note } from "@/types/note";
+import { thought } from "@/types/thought";
+
 function safeJsonParse(str: string) {
     try {
       return JSON.parse(str);
@@ -9,6 +12,26 @@ function safeJsonParse(str: string) {
 export default class BackendPath {
     // either you make a proxy or not, if you don't, this will read from environment variable
     static readonly BASE_URL: string = "/api";
+
+    public static HelloWorld = class {
+        static readonly PATH: string = `${BackendPath.BASE_URL}`;
+
+        public static async GetHelloWorld(): Promise<string> {
+            const path = `${this.PATH}`;
+
+            const res = await fetch(path, {
+                method: "GET",
+            });
+            if (!res.ok) {
+                const data = await res.text();
+                return Promise.reject({
+                    name: `${res.status}`,
+                    message: data ? safeJsonParse(data) ?? data : null,
+                } as Error);
+            }
+            return await res.text();
+        }
+    }
 
     public static Auth = class {
         static readonly PATH: string = `${BackendPath.BASE_URL}/auth`;
