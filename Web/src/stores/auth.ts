@@ -20,6 +20,11 @@ export const useAuthStore = defineStore("auth", () => {
         console.log(result);
     }
 
+    const verifyLoggedIn: () => boolean = () => {
+        // you want to call the api to verify the token is not expired and it's not some random token
+        return false;
+    }
+
     // const testStorage: (
     //     testValue: string
     // ) => void = (newVal) => {
@@ -29,7 +34,8 @@ export const useAuthStore = defineStore("auth", () => {
     return {
         jwtToken,
         login,
-        testApi
+        testApi,
+        verifyLoggedIn,
         // testStorage
     }
 });

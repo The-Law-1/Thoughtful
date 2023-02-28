@@ -12,11 +12,11 @@
   const route = useRoute();
   const layout = shallowRef<Component>(DefaultLayout);
   
-  watch(
-    () => route.meta?.layout,
-    () => {
-      layout.value = route.meta?.layout || DefaultLayout;
-    }
-  );
+//   watch(
+//     () => route.meta?.layout,
+//     () => {
+//       layout.value = route.meta?.layout || DefaultLayout;
+//     }
+//   );
   </script>
   
