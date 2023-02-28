@@ -36,6 +36,28 @@ export default class BackendPath {
     public static Auth = class {
         static readonly PATH: string = `${BackendPath.BASE_URL}/auth`;
 
+        public static async VerifyToken(token: string): Promise<boolean> {
+            const path = `${this.PATH}/verify`;
+
+            const res = await fetch(path, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ token }),
+            });
+            if (!res.ok) {
+                const data = await res.text();
+                return Promise.reject({
+                    name: `${res.status}`,
+                    message: data ? safeJsonParse(data) ?? data : null,
+                } as Error);
+            }
+            if (res.status === 200)
+                return true;
+            return false;
+        }
+
         // you could make a type for the access_token object
         public static async Login(password: string): Promise<any> {
             const path = `${this.PATH}/login`;

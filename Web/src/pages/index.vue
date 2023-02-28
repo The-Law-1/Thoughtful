@@ -14,6 +14,7 @@
 
 </template>
 
+<!-- * don't love that all this is in index.vue but it's fine -->
 <script setup lang="ts">
     import { ref, onMounted } from 'vue';
     import { useAuthStore } from '@/stores/auth';
@@ -27,8 +28,6 @@
     let animateFadeInTxt = (fullText: string) => {
         // loop over each letter in the text
         for (let i = 0; i < fullText.length; i++) {
-            // add each letter to the array
-
             // add a small timeout
             setTimeout(() => {
                 // add the letter to the array
@@ -37,7 +36,8 @@
         }
     };
 
-    let userLoggedIn = authStore.verifyLoggedIn();
+    // thank god for base level await huh, otherwise we could do it in mounted
+    let userLoggedIn = await authStore.verifyLoggedIn();
 
     // click getstarted
     let getStarted = ref(() => {

@@ -13,8 +13,6 @@ module.exports = {
       
         // that is animation class
         animation: {
-            fade_in_txt: 'fadeInTxt 2s ease-in-out',
-            fade_in_bg: 'fadeInBg 2s ease-in-out',
             fade_in: 'fadeIn 2s ease-in-out',
             fade_out: 'fadeOut 2s ease-in-out',
         },
@@ -29,14 +27,6 @@ module.exports = {
                 '0%': { opacity: '1' },
                 '100%': { opacity: '0' },
             },
-            fadeInTxt: {
-            '0%': { color: theme('colors.transparent') },
-            '100%': { color: theme('colors.black') },
-            },
-            fadeInBg: {
-                '0%': { backgroundColor: theme('colors.transparent') },
-                '100%': { backgroundColor: theme('colors.gunmetal') },
-            }
         }),
     },
   },
