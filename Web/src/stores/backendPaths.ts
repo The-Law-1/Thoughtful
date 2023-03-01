@@ -43,8 +43,8 @@ export default class BackendPath {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ token }),
             });
             if (!res.ok) {
                 const data = await res.text();

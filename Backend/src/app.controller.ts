@@ -27,7 +27,7 @@ export class AppController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Get("verify")
+    @Get("auth/verify")
     @HttpCode(200)
     @HttpCode(401)
     async verify() {
