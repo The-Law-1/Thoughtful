@@ -68,7 +68,7 @@ export default class BackendPath {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({ password }),
-            });
+            })
             if (!res.ok) {
                 const data = await res.text();
                 return Promise.reject({

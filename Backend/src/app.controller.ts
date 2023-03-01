@@ -17,6 +17,8 @@ export class AppController {
 
     // @UseGuards(AuthGuard()) 
     @Post('auth/login')
+    @HttpCode(200)
+    @HttpCode(401)
     async login(@Body() auth: AuthDto) {
         if (await this.authService.authenticate(auth.password)) {
             return this.authService.createJWT();

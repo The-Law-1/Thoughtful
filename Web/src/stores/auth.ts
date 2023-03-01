@@ -9,9 +9,23 @@ export const useAuthStore = defineStore("auth", () => {
   
     const login: (
       password: string,
-    ) => Promise<void> = async (password) => {
-      const result = await Backend.Auth.Login(password);
-      jwtToken.value = result.access_token;
+    ) => Promise<boolean> = async (password) => {
+        try {            
+            const result = await Backend.Auth.Login(password);
+
+            let jsonValue = JSON.parse(result);
+            jwtToken.value = jsonValue.access_token;
+    
+            console.log("Successfully logged in " + result);
+            // console.log("Access token " + jsonValue.access_token);
+
+            return true;
+        } catch (e) {
+            console.log("Bad password");
+            jwtToken.value = null;
+            return false;
+        }
+        return false;
     };
 
     const testApi: () => Promise<void> = async () => {

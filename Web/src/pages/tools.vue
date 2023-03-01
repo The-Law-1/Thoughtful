@@ -52,7 +52,8 @@
         // * you need to prevent default for the event to prevent the browser from doing its own thing
         console.log("Can handle hotkeys here. Ctrl key is: " + evt.ctrlKey);
     }
-    window.addEventListener("keypress", handleHotkeys);
+    // ! this adds the event forever, if you need, add it when routing to tools, and remove it when you leave
+    // window.addEventListener("keypress", handleHotkeys);
 
     var toolSelected = (idx: number) => {
         currentToolIdx.value = idx;
