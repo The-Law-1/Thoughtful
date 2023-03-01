@@ -15,7 +15,7 @@
                 class="bg-white w-full max-h-[50vh] rounded-lg mt-1 text-left overflow-y-hidden">
 
                 <ComboboxOption v-slot="{ selected, active }" v-if="queryVal" :value="queryVal">
-                    <SearchBarItem :active="active" :selected="selected" :displayVal="'Press enter to create ' + query"></SearchBarItem> 
+                    <SearchBarItem :active="active" :selected="selected" :displayVal="'Press enter to create ' + query" :deletable="false"></SearchBarItem> 
                 </ComboboxOption>
 
                 <ComboboxOption
@@ -25,7 +25,9 @@
                     :key="'search-result-' + i"
                     :value="searchResult"
                 >
-                    <SearchBarItem :active="active" :selected="selected" :displayVal="displayValues(searchResult)">
+                    <SearchBarItem
+                        @deleted-item="() => deleteItem(searchResult)"
+                        :active="active" :selected="selected" :displayVal="displayValues(searchResult)" :deletable="true">
 
                     </SearchBarItem>
                 </ComboboxOption>
@@ -82,6 +84,16 @@
     const queryVal = computed(() => {
         return query.value === '' ? null : query.value;
     });
+
+    let deleteItem = ref((item: any) => {
+        console.log(item);
+        // this is probably only db items but just to be safe
+        if (item._id) {
+            alert("Trying to delete item " + item._id);
+        } else {
+            alert("Invalid delete");
+        }
+    })
 
     var currentSearchTimeout = null as any;
     let buffering = ref(false);
