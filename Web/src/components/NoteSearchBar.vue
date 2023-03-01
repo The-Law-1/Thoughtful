@@ -8,7 +8,7 @@
                     <GenericCombobox
                         :placeholder="'Search notes'"
                         :searchFunction="filterResults"
-                        @optionSelected="onSelected"
+                        @onSelected="onSelected"
                         :displayValues="(val:note) => (val as note) === null ? '' : val.title"
                         >
                     </GenericCombobox>
@@ -37,7 +37,7 @@
         return newResults;
     }
 
-    var onSelected = async (newValue:any) => {
+    var onSelected = async (newValue:(note|string)) => {
         console.log("Selected new option: ", newValue);
 
         await searchStore.noteSelected(newValue);

@@ -1,12 +1,14 @@
 import NewThoughtModal from '@/components/NewThoughtModal.vue';
 import { note } from '@/types/note';
 import { defineStore, acceptHMRUpdate } from 'pinia';
+import { useRouter } from 'vue-router';
 import { useAuthStore } from './auth';
 import BackendPaths from './backendPaths';
 
 
 export const useSearchStore = defineStore('search', () => {
     const authStore = useAuthStore();
+    const router = useRouter();
 
     async function filterNotes(filter:string): Promise<note[]> {
         let filteredResults = await BackendPaths.Notes.GetNotesByTitle(authStore.jwtToken, filter);
@@ -18,13 +20,20 @@ export const useSearchStore = defineStore('search', () => {
 
     // }
 
-    async function noteSelected(noteObj:any, router: any = null) {
+    async function noteSelected(noteObj:(note|string)) : Promise<note|void> {
 
         if (typeof noteObj === "string") {
-            // TODO call the backend to create a new note
             console.log("Calling the backend to create note: ", noteObj);
+
+            let createdNote = await BackendPaths.Notes.CreateNote(authStore.jwtToken, { title: noteObj, thoughts: [], id: "" } as note);
+
+            console.log("Created note: ", createdNote);
+
+            return createdNote;
         } else {
-            console.log("Navigating to note: ", noteObj.name);
+            console.log("Selected note: ");
+            console.log(noteObj);
+            // console.log("Navigating to note: ", noteObj.title);
             // router.push({ path: "/note", query: { noteName:(newValue as string) } });
         }
     }

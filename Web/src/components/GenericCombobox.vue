@@ -11,10 +11,11 @@
                 :displayValue="(res:any) => displayValues(res)"
                 @change="query = $event.target.value" />
             <ComboboxOptions
+                v-if="!buffering"
                 class="bg-white w-full max-h-[50vh] rounded-lg mt-1 text-left overflow-y-hidden">
 
-                <ComboboxOption class="bg-teal-600 text-white" v-if="!buffering && queryVal && filteredResults.length === 0" :value="queryVal">
-                    Press enter to create: "{{ query }}"
+                <ComboboxOption v-slot="{ selected, active }" v-if="queryVal" :value="queryVal">
+                    <SearchBarItem :active="active" :selected="selected" :displayVal="'Press enter to create ' + query"></SearchBarItem> 
                 </ComboboxOption>
 
                 <ComboboxOption
@@ -103,6 +104,8 @@
 
     // * selected something new
     watch(selectedOption, async (newValue:any) => {
+        console.log("Selected a new option: " + newValue);
+
         if (newValue === null || newValue.length === 0)
             return;
 
