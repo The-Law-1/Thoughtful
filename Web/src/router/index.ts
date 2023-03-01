@@ -49,17 +49,12 @@ router.beforeEach(async (to) => {
     if (to.name === "login") {
         return;
     }
+    // ! this is not wise, I should check the expiration date client side. But it's a small app 
+    await auth.verifyLoggedIn();
     if (auth.jwtToken === null) {
         return "/login";
     }
 
-  // how does this work?
-//   if (!to.meta?.signedIn) {
-//     return;
-//   }
-//   if (!auth.jwtToken) {
-//     return "/login";
-//   }
 //   if (auth.jwtPayload.exp < Date.now() / 1000) {
 //     if (!auth.canRefreshToken) return "/login";
 //     const state = promistate(async () => await auth.refresh());
