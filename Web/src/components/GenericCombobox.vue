@@ -13,7 +13,7 @@
             <ComboboxOptions
                 class="bg-white w-full max-h-[50vh] rounded-lg mt-1 text-left overflow-y-hidden">
 
-                <ComboboxOption class="bg-teal-600 text-white" v-if="queryVal && filteredResults.length === 0" :value="queryVal">
+                <ComboboxOption class="bg-teal-600 text-white" v-if="!buffering && queryVal && filteredResults.length === 0" :value="queryVal">
                     Press enter to create: "{{ query }}"
                 </ComboboxOption>
 
@@ -31,8 +31,10 @@
             </ComboboxOptions>
         </Combobox>
 
+        <div v-show="buffering">
+            <ArrowPathIcon class="animate-spin h-5 w-5"></ArrowPathIcon>
+        </div>
     </main>
-
 </template>
 
 <script lang="ts" setup>
@@ -45,7 +47,7 @@
         ComboboxOption,
         TransitionRoot,
         } from '@headlessui/vue'
-    import { MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
+    import { MagnifyingGlassIcon, ArrowPathIcon } from "@heroicons/vue/24/solid";
     import SearchBarItem from "@/components/SearchBarItem.vue";
 
     var props = defineProps({
@@ -81,6 +83,7 @@
     });
 
     var currentSearchTimeout = null as any;
+    let buffering = ref(false);
 
     watch(query, (newVal, oldVal) => {
         if (newVal.length > 0) {
@@ -88,8 +91,10 @@
                 clearTimeout(currentSearchTimeout);
             }
 
+            buffering.value = true;
             currentSearchTimeout = setTimeout(async () => {
                 filteredResults.value = await props.searchFunction(newVal);
+                buffering.value = false;
 
                 currentSearchTimeout = null;
             }, 400);

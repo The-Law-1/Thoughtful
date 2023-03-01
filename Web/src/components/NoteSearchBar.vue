@@ -32,7 +32,7 @@
     var filterResults = async (searchQuery:string) => {
         console.log("Searching: ", searchQuery);
 
-        var newResults = await searchStore.fetchNote(searchQuery);
+        var newResults = await searchStore.filterNotes(searchQuery);
         console.log("Got filteredResults: ", newResults);
         return newResults;
     }
