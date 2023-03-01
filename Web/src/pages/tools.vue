@@ -21,13 +21,18 @@
 </template>
 
 <script setup lang="ts">
+    import NoteSearchBarVue from "@/components/NoteSearchBar.vue";
+    import ThoughtSearchBarVue from "@/components/ThoughtSearchBar.vue";
     import { useNoteStore } from "@/stores/notes";
     import { useSearchStore } from "@/stores/search";
     import { LightningBoltIcon } from '@heroicons/vue/solid';
-    import { resolveComponent, ref, markRaw } from "vue";
+    import { resolveComponent, ref, markRaw, shallowRef } from "vue";
 
-    const ThoughtSearchBar = markRaw(resolveComponent('ThoughtSearchBar') as any);
-    const NoteSearchBar = markRaw(resolveComponent('NoteSearchBar') as any);
+    const ThoughtSearchBar = shallowRef(ThoughtSearchBarVue);
+    const NoteSearchBar = shallowRef(NoteSearchBarVue);
+    
+    // const ThoughtSearchBar = markRaw(resolveComponent('ThoughtSearchBar') as any);
+    // const NoteSearchBar = markRaw(resolveComponent('NoteSearchBar') as any);
 
     // let noteStore = ref(useNoteStore() as any);
     let noteStore = useNoteStore() as any;

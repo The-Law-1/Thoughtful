@@ -1,15 +1,16 @@
 <template>
     <div class="flex">
+        <!-- * I don't love the sidebar -->
         <Sidebar v-show="isSidebarOpen"/>
-        <button
+        <!-- <button
             class="focus:outline-none focus:shadow-outline"
             @click="toggleSidebar"
             >
             <div class="hover:bg-blue-200 hover:bg-opacity-30 rounded-sm">
-                <MenuIcon v-if="!isSidebarOpen" class="h-5 w-5" aria-hidden="true" />
+                <Bars3Icon v-if="!isSidebarOpen" class="h-5 w-5" aria-hidden="true" />
                 <ChevronDoubleLeftIcon ftIcon v-else class="h-5 w-5" aria-hidden="true" />
             </div>
-        </button>
+        </button> -->
         <router-link to="/" class="hover:bg-blue-200 hover:bg-opacity-30 rounded-sm">
             <HomeIcon class="h-5 w-5" aria-hidden="true" />
         </router-link>
@@ -17,13 +18,17 @@
 </template>
 
 <script setup lang="ts">
-    import { MenuIcon, HomeIcon, ChevronDoubleLeftIcon } from '@heroicons/vue/solid';
-    import { ref, watch } from 'vue';
+    import { ChevronDoubleLeftIcon, Bars3Icon, HomeIcon } from "@heroicons/vue/24/solid";
+    import Sidebar from "@/components/Sidebar.vue";
+    import { ref, watch, onMounted } from 'vue';
     import { useNavbarStore } from '@/stores/navbar';
     import { useNoteStore } from "@/stores/notes";
 
     let noteStore = useNoteStore();
-    await noteStore.fetchNotes();
+
+    onMounted(async () => {
+        await noteStore.fetchNotes();
+    });
 
     let navBarStore = useNavbarStore();
 

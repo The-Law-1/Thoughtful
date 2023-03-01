@@ -4,6 +4,7 @@ import indexVue from "@/pages/index.vue";
 import defaultLayout from "@/layouts/default.vue";
 import NotFoundView from "@/pages/404.vue";
 import loginVue from "@/pages/login.vue";
+import toolsVue from "@/pages/tools.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -22,6 +23,14 @@ const router = createRouter({
       meta: {
         layout: defaultLayout,
       },
+    },
+    {
+        path: "/tools",
+        name: "tools",
+        component: toolsVue,
+        meta: {
+            layout: defaultLayout,
+        },
     },
     {
         path: "/login",

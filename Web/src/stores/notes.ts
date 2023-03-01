@@ -1,3 +1,4 @@
+import { note } from '@/types/note';
 import { defineStore } from 'pinia';
 
 // ! this whole store could become obsolete, it's meant for local demo
@@ -9,8 +10,8 @@ export const useNoteStore = defineStore('notes', {
     }
   },
   getters: {
-    getNoteNames: (state) => state.list.map((note) => note.name),
-    getNote: (state) => (name: string) => state.list.find((note) => note.name === name),
+    getNoteNames: (state) => state.list.map((note) => note.title),
+    getNote: (state) => (name: string) => state.list.find((note) => note.title === name),
   },
   // could also be defined as
   // state: () => ({ count: 0 })
@@ -75,13 +76,7 @@ export const useNoteStore = defineStore('notes', {
     },
     async fetchNotes() {
         // let placeHolders = await $fetch("https://jsonplaceholder.typicode.com/posts");
-        let placeHolders = await $fetch("https://jsonplaceholder.typicode.com/users");
-
-        if (placeHolders) {
-            (placeHolders as any[]).forEach(placeHolder => {
-                this.$state.list.push({ id: this.generateRandomID(), name: placeHolder.company.name, content: [], emoji: "" });
-            });
-        }
+        return [];
     }
   },
 })

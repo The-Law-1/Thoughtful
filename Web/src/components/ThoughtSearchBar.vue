@@ -26,8 +26,9 @@
     import { useSearchStore } from "@/stores/search";
     import { useNavbarStore } from "@/stores/navbar";
     import { ref, computed, watch, shallowRef } from 'vue';
-
     import { useRouter } from "vue-router";
+    import { thought } from "@/types/thought";
+    import GenericCombobox from "@/components/GenericCombobox.vue";
 
     let navBarStore = ref(useNavbarStore());
     let searchStore = useSearchStore();

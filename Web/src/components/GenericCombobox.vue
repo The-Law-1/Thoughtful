@@ -3,7 +3,7 @@
     <main>
         <Combobox v-model="selectedOption" nullable>
             <span>
-                <SearchIcon class="absolute mt-5 w-12 h-12"></SearchIcon>
+                <MagnifyingGlassIcon class="absolute mt-5 w-12 h-12"></MagnifyingGlassIcon>
             </span>
             <ComboboxInput
                 autocomplete="off"
@@ -46,7 +46,8 @@
         ComboboxOption,
         TransitionRoot,
         } from '@headlessui/vue'
-    import { SearchIcon, CheckIcon, SelectorIcon, XIcon } from '@heroicons/vue/solid';
+    import { MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
+    import SearchBarItem from "@/components/SearchBarItem.vue";
 
     var props = defineProps({
         searchFunction: {

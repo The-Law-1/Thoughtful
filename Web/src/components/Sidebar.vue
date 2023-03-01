@@ -7,12 +7,12 @@
         </button> -->
 
         <div class="bg-slate-600 absolute w-[20rem] min-w-[20rem] flex flex-col max-h-[50vh] overflow-y-scroll">
-            <NuxtLink
+            <div
                 v-for="note in sideBarItems"
                 :to="{ path: '/note', query: { noteName: note } }"
                 class="text-white my-1 hover:bg-slate-400 rounded-lg">
                 > {{note}}
-            </NuxtLink>
+            </div>
             
         </div>
     </div>

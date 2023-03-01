@@ -36,8 +36,7 @@
         }
     };
 
-    // thank god for base level await huh, otherwise we could do it in mounted
-    let userLoggedIn = await authStore.verifyLoggedIn();
+    let userLoggedIn = false;
 
     // click getstarted
     let getStarted = ref(() => {
@@ -50,7 +49,9 @@
         }
     });
 
-    onMounted(() => {
+    onMounted(async () => {
+        userLoggedIn = await authStore.verifyLoggedIn();
+
         let welcomeText = "Thoughtful";
         setTimeout(() => {
             animateFadeInTxt(welcomeText);
