@@ -44,7 +44,14 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to) => {
-  const auth = useAuthStore();
+    const auth = useAuthStore();
+
+    if (to.name === "login") {
+        return;
+    }
+    if (auth.jwtToken === null) {
+        return "/login";
+    }
 
   // how does this work?
 //   if (!to.meta?.signedIn) {
