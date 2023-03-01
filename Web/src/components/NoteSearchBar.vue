@@ -9,7 +9,7 @@
                         :placeholder="'Search notes'"
                         :searchFunction="filterResults"
                         @optionSelected="onSelected"
-                        :displayValues="(val:note) => (val as note) === null ? '' : val.name"
+                        :displayValues="(val:note) => (val as note) === null ? '' : val.title"
                         >
                     </GenericCombobox>
                 </div>
@@ -23,6 +23,8 @@
     import { useSearchStore } from "@/stores/search";
     import { useNavbarStore } from "@/stores/navbar";
     import { ref, computed, watch, shallowRef } from 'vue';
+    import { note } from "@/types/note";
+    import GenericCombobox from "@/components/GenericCombobox.vue";
 
     let navBarStore = ref(useNavbarStore());
     let searchStore = useSearchStore();

@@ -5,7 +5,7 @@ import Navbar from '@/components/Navbar.vue';
 import Navbar from '@/components/Navbar.vue';
 
 <template>
-  <div class=" bg-snow">
+  <div class=" h-[100vh] bg-snow">
     <Navbar/>
     <!-- sidebar -->
     <slot />

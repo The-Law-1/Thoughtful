@@ -1,13 +1,12 @@
 <template>
-
     <main>
         <Combobox v-model="selectedOption" nullable>
             <span>
-                <MagnifyingGlassIcon class="absolute mt-5 w-12 h-12"></MagnifyingGlassIcon>
+                <MagnifyingGlassIcon class="absolute mt-3 w-12 h-12"></MagnifyingGlassIcon>
             </span>
             <ComboboxInput
                 autocomplete="off"
-                class=" pl-12 w-full h-20 text-4xl rounded-lg outline-none border-none"
+                class="focus:outline-none transition ease-in-out duration-300 text-black focus:border-b-gunmetal bg-transparent border-b-2 border-b-gray-200  pl-12 w-full h-20 text-4xl rounded-lg"
                 :placeholder="placeholder"
                 :displayValue="(res:any) => displayValues(res)"
                 @change="query = $event.target.value" />
