@@ -42,7 +42,7 @@
     var filterResults = async (searchQuery:string) => {
         console.log("Searching: ", searchQuery);
 
-        var newResults = await searchStore.fetchThought(searchQuery);
+        var newResults = await searchStore.filterThoughts(searchQuery);
         console.log("Got filteredResults: ", newResults);
         return newResults;
     }

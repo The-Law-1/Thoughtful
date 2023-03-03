@@ -1,13 +1,16 @@
 import NewThoughtModal from '@/components/NewThoughtModal.vue';
 import { note } from '@/types/note';
+import { thought } from '@/types/thought';
 import { defineStore, acceptHMRUpdate } from 'pinia';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from './auth';
 import BackendPaths from './backendPaths';
+import { useNoteStore } from './notes';
 
 
 export const useSearchStore = defineStore('search', () => {
     const authStore = useAuthStore();
+    const noteStore = useNoteStore();
     const router = useRouter();
 
     async function filterNotes(filter:string): Promise<note[]> {
@@ -16,21 +19,13 @@ export const useSearchStore = defineStore('search', () => {
         return filteredResults;
     }
 
-    // async function filterThoughts(query:string): Promise<thought[]> {
-
-    // }
-
+    
     async function noteSelected(noteObj:(note|string)) : Promise<note|void> {
-
+        
         if (typeof noteObj === "string") {
             console.log("Calling the backend to create note: ", noteObj);
-
-            // TODO you probably wanna call the note store here
-            let createdNote = await BackendPaths.Notes.CreateNote(authStore.jwtToken, { title: noteObj, thoughts: [], id: "" } as note);
-
-            console.log("Created note: ", createdNote);
-
-            return createdNote;
+            
+            return await noteStore.createNote({ title: noteObj, thoughts: [], id: "" } as note);
         } else {
             console.log("Selected note: ");
             console.log(noteObj);
@@ -39,6 +34,12 @@ export const useSearchStore = defineStore('search', () => {
         }
     }
 
+    async function filterThoughts(query:string): Promise<thought[]> {
+        let filteredResults = await BackendPaths.Thoughts.GetThoughtsByContent(authStore.jwtToken, query);
+
+        return filteredResults;
+    }
+    
     async function thoughtSelected(thoughtObj:any, router: any = null) {
 
         if (typeof thoughtObj === "string") {
@@ -56,7 +57,8 @@ export const useSearchStore = defineStore('search', () => {
         filterNotes,
         // fetchThought,
         noteSelected,
-        thoughtSelected
+        thoughtSelected,
+        filterThoughts
     }
 })
 

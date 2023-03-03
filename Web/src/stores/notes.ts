@@ -7,9 +7,15 @@ import BackendPaths from './backendPaths';
 
 export const useNoteStore = defineStore('notes', () => {
     const authStore = useAuthStore();
-    const router = useRouter();
+    // const router = useRouter();
 
     // create note 
+    async function createNote(noteObj: note) : Promise<note> {
+
+        let createdNote = await BackendPaths.Notes.CreateNote(authStore.jwtToken, noteObj);
+
+        return createdNote;
+    }
 
     // delete note
     async function deleteNote(noteId: string) : Promise<note> {
@@ -20,7 +26,8 @@ export const useNoteStore = defineStore('notes', () => {
     }
 
     return {
-        deleteNote
+        deleteNote,
+        createNote
     }
 })
 

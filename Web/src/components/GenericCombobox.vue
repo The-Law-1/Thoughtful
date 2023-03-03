@@ -122,11 +122,14 @@
 
     // * selected something new
     watch(selectedOption, async (newValue:any) => {
-        console.log("Selected a new option: " + newValue);
+        console.log("Selected a new option: ", newValue);
 
-        if (newValue === null || newValue.length === 0)
+        if (newValue === null || newValue.length === 0) {
+            console.log("not emitting because it's null or empty");
             return;
+        }
 
+        console.log("Emitting on selected");
         emit("onSelected", newValue);
     });
 

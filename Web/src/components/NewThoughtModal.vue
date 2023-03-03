@@ -47,8 +47,8 @@
                 <GenericCombobox
                     :placeholder="'Search notes'"
                     :searchFunction="filterResults"
-                    @optionSelected="onSelected"
-                    :displayValues="(val:note) => (val as note) === null ? '' : val.name"
+                    @on-selected="onSelected"
+                    :displayValues="(val:note) => (val as note) === null ? '' : val.title"
                     >
                 </GenericCombobox>
               </DialogPanel>
@@ -72,9 +72,15 @@
     import NoteSearchBar from './NoteSearchBar.vue';
     import { useNoteStore } from "@/stores/notes";
     import { useSearchStore } from "@/stores/search";
+    import { note } from "@/types/note";
+    // * this import is not working, FOR NO REASON
+    // import { thought } from "@/types/thought";
+    import GenericCombobox from "@/components/GenericCombobox.vue";
+    import { useThoughtStore } from '@/stores/thoughts';
  
     let searchStore = useSearchStore();
     let noteStore = useNoteStore();
+    let thoughtStore = useThoughtStore();
 
     const isOpen = ref(true);
 
@@ -92,13 +98,31 @@
     var filterResults = async (searchQuery:string) : Promise<note[]> => {
         console.log("Searching: ", searchQuery);
 
-        var newResults = await searchStore.fetchNote(searchQuery);
+        var newResults = await searchStore.filterNotes(searchQuery);
         console.log("Got filteredResults: ", newResults);
         return newResults;
     }
 
     var onSelected = async (newValue:any) => {
-        await noteStore.addThought(newValue, props.thought);
+        // can be a string or a note object
+
+        console.log("Caught selected from thoughtmodal: ", newValue);
+
+        // id is useless, we only send content and noteId to the server haha
+        // but we need it because of type thought
+        let thoughtObject = { 
+            id: "",
+            content: props.thought,
+            noteId: ""};
+
+        if (typeof newValue !== 'string') {
+            // id or _id? We'll find out soon enough
+            console.log("Got note: ", newValue);
+            thoughtObject.noteId = newValue._id;
+        }
+
+        console.log("Sending thought: ", thoughtObject);
+        await thoughtStore.createThought(thoughtObject);
         closeModal();
     }
     
