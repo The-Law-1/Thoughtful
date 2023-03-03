@@ -20,7 +20,7 @@ export class NoteController {
     @Post()
     @HttpCode(201)
     async create(@Body() createNoteDto: CreateNoteDto): Promise<Note> {
-        return this.noteService.create(createNoteDto);
+        return await this.noteService.create(createNoteDto);
     }
 
     /**
@@ -66,7 +66,7 @@ export class NoteController {
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
     @Delete(":id")
-    @HttpCode(204)
+    @HttpCode(200)
     async deleteOne(@Param("id") idParam: string): Promise<Note> {
         return this.noteService.DeleteOne(idParam);
     }
