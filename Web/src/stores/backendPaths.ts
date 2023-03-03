@@ -230,6 +230,28 @@ export default class BackendPath {
     public static Thoughts = class {
         static readonly PATH: string = `${BackendPath.BASE_URL}/thoughts`;
 
+        // either adds a thought to a note or creates a new note with the thought
+        public static async CreateThoughtOnNote(token: string, newThought: thought, noteTitle: string) {
+            const path = `${this.PATH}/note/${noteTitle}`;
+
+            const res = await fetch(path, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ content: newThought.content, noteId: newThought.noteId }),
+            });
+            if (!res.ok) {
+                const data = await res.text();
+                return Promise.reject({
+                    name: `${res.status}`,
+                    message: data ? safeJsonParse(data) ?? data : null,
+                } as Error);
+            }
+            return await res.json();
+        }
+
         public static async CreateThought(token: string, newThought: thought): Promise<thought> {
             const path = `${this.PATH}`;
 

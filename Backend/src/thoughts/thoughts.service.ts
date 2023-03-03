@@ -36,6 +36,32 @@ export class ThoughtsService {
         return createdThought;
     }
 
+    async addThoughtToNote(noteTitle: string, createThoughtDto: CreateThoughtDto): Promise<Thought> {
+        const createdThought = new this.thoughtModel(createThoughtDto);
+
+        // check if note exists
+        const notes = await this.noteService.FindAllByTitle(noteTitle);
+        if (notes.length > 0) {
+            let noteToChange = notes[0];
+            // add the thought to the note
+            noteToChange.thoughts.push(createdThought);
+            // save the note
+            await this.noteService.UpdateOne(noteToChange._id, {title: noteToChange.title, thoughts: noteToChange.thoughts});
+        } else {
+
+            
+            // create a new note
+            const newNote = await this.noteService.create({title: noteTitle, thoughts: [] });
+            // add the noteId to the thought
+            createdThought.noteId = newNote._id;
+
+            await this.noteService.AddThought(newNote._id, {_id: createdThought._id, content: createThoughtDto.content, noteId: newNote._id });
+        }
+        createdThought.save();
+
+        return createdThought;
+    }
+
     // I hardly see a use for this but you never know
     async FindAll(): Promise<Thought[]> {
         return this.thoughtModel.find().exec();

@@ -26,6 +26,20 @@ export class ThoughtsController {
     }
 
     /**
+     * Add thought to note, either creating using title or simply adding
+     * @param noteTitle title of note to create
+     * @param createThoughtDto thought to create
+     * @returns created thought
+     */
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @Post("note/:title")
+    @HttpCode(201)
+    async addThoughtToNote(@Param("title") noteTitle:string, @Body() createThoughtDto: CreateThoughtDto): Promise<Thought> {
+        return this.thoughtsService.addThoughtToNote(noteTitle, createThoughtDto);
+    }
+
+    /**
      * Get all thoughts
      * @returns All thoughts
      */
@@ -72,10 +86,4 @@ export class ThoughtsController {
     async deleteOne(@Param("id") idParam: string): Promise<Thought> {
         return this.thoughtsService.DeleteOne(idParam);
     }
-
-
-
-
-
-
 }

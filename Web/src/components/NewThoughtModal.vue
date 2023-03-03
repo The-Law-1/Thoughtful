@@ -119,10 +119,14 @@
             // id or _id? We'll find out soon enough
             console.log("Got note: ", newValue);
             thoughtObject.noteId = newValue._id;
+            console.log("Sending thought: ", thoughtObject);
+            await thoughtStore.createThought(thoughtObject);
+        } else {
+            console.log("Sending thought with note title: ", thoughtObject, newValue);
+
+            await thoughtStore.createThoughtWithNoteTitle(thoughtObject, newValue);
         }
 
-        console.log("Sending thought: ", thoughtObject);
-        await thoughtStore.createThought(thoughtObject);
         closeModal();
     }
     
