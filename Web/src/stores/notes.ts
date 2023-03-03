@@ -1,82 +1,30 @@
 import { note } from '@/types/note';
-import { defineStore } from 'pinia';
+import { acceptHMRUpdate, defineStore } from 'pinia';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from './auth';
+import BackendPaths from './backendPaths';
 
-// ! this whole store could become obsolete, it's meant for local demo
 
-export const useNoteStore = defineStore('notes', {
-  state: () => {
-    return { 
-        list: [] as note []
+export const useNoteStore = defineStore('notes', () => {
+    const authStore = useAuthStore();
+    const router = useRouter();
+
+    // create note 
+
+    // delete note
+    async function deleteNote(noteId: string) : Promise<note> {
+
+        let deletedNote = await BackendPaths.Notes.DeleteNoteById(authStore.jwtToken, noteId);
+
+        return deletedNote;
     }
-  },
-  getters: {
-    getNoteNames: (state) => state.list.map((note) => note.title),
-    getNote: (state) => (name: string) => state.list.find((note) => note.title === name),
-  },
-  // could also be defined as
-  // state: () => ({ count: 0 })
-  actions: {
-    generateRandomID() {
-        return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    },
-    addNote(title:string = "") {
-        // TODO call the backend, then update the state
 
-        this.$state.list.push({id: this.generateRandomID(), name: title, content: [], emoji: ""});
-
-    },
-    removeNote(noteName:string) {
-
-        // TODO call the backend, then update the state
-
-        let noteIdx = this.$state.list.findIndex((note) => note.name === noteName);
-        if (noteIdx > -1) {
-            this.$state.list.splice(noteIdx, 1);
-        }
-    },
-    insertThought(noteName:string, index:number, thought:string) {
-
-        // TODO call the backend, then update the state if successful
-
-        let note = this.$state.list.find((note) => note.name === noteName);
-        if (note) {
-            let newThought = {content: thought, id: this.generateRandomID(), noteParent: noteName};
-            if (index === note.content.length) {
-                note.content.push(newThought);
-            } else {
-                note.content.splice(index, 0, newThought);
-            }
-        }
-    },
-    async addThought(noteName:string, thought:string) {        
-        // TODO call the backend, update the list
-
-        let note = this.$state.list.find((note) => note.name === noteName);
-        if (note) {
-            let newThought = {content: thought, id: this.generateRandomID(), noteParent: noteName};
-
-            note.content.push(newThought);
-        }
-    },
-    updateThought(noteName:string, thoughtIdx:number, thought:string) {
-        // TODO call the backend, update the list
-
-        let note = this.$state.list.find((note) => note.name === noteName);
-        if (note && note.content[thoughtIdx]) {
-            note.content[thoughtIdx].content = thought;
-        }
-    },
-    removeThought(noteName:string, thoughtIdx:number) {
-        // TODO call the backend, update the list
-
-        let note = this.$state.list.find((note) => note.name === noteName);
-        if (note) {
-            note.content.splice(thoughtIdx, 1);
-        }
-    },
-    async fetchNotes() {
-        // let placeHolders = await $fetch("https://jsonplaceholder.typicode.com/posts");
-        return [];
+    return {
+        deleteNote
     }
-  },
 })
+
+// make sure to pass the right store definition, `useAuth` in this case.
+if (import.meta.hot) {
+    import.meta.hot.accept(acceptHMRUpdate(useNoteStore, import.meta.hot))
+}

@@ -49,8 +49,9 @@ router.beforeEach(async (to) => {
     if (to.name === "login") {
         return;
     }
-    // ! this is not wise, I should check the expiration date client side. But it's a small app 
-    await auth.verifyLoggedIn();
+    // ! this is not wise, I should check the expiration date client side. But it's a small app
+    if (!await auth.verifyLoggedIn())
+        return "/login";
     if (auth.jwtToken === null) {
         return "/login";
     }

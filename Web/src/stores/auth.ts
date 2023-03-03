@@ -37,8 +37,17 @@ export const useAuthStore = defineStore("auth", () => {
     const verifyLoggedIn: () => Promise<boolean> = async () => {
         // you want to call the api to verify the token is not expired and it's not some random token
         if (jwtToken.value) {
-            let isValid = await Backend.Auth.VerifyToken(jwtToken.value);
-            return isValid;
+            try {
+                let isValid = await Backend.Auth.VerifyToken(jwtToken.value);
+
+                if (!isValid)
+                    jwtToken.value = null;
+
+                return isValid;
+            } catch (error) {
+                jwtToken.value = null;
+                return false;
+            }
         }
         return false;
     }

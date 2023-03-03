@@ -46,7 +46,8 @@ export default class BackendPath {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            if (!res.ok) {
+            // * apparently, unauthorized constitutes an "ok" response. lol
+            if (!res.ok || res.status === 401) {
                 const data = await res.text();
                 return Promise.reject({
                     name: `${res.status}`,
@@ -178,7 +179,7 @@ export default class BackendPath {
                     message: data ? safeJsonParse(data) ?? data : null,
                 } as Error);
             }
-            return await res.json();
+            return res.json();
         }
 
         // update

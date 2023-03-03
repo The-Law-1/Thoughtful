@@ -9,6 +9,7 @@
                         :placeholder="'Search notes'"
                         :searchFunction="filterResults"
                         @onSelected="onSelected"
+                        @onDeleted="onDeleted"
                         :displayValues="(val:note) => (val as note) === null ? '' : val.title"
                         >
                     </GenericCombobox>
@@ -28,6 +29,7 @@
 
     let navBarStore = ref(useNavbarStore());
     let searchStore = useSearchStore();
+    let noteStore = useNoteStore();
 
     var filterResults = async (searchQuery:string) => {
         console.log("Searching: ", searchQuery);
@@ -35,6 +37,15 @@
         var newResults = await searchStore.filterNotes(searchQuery);
         console.log("Got filteredResults: ", newResults);
         return newResults;
+    }
+
+    let onDeleted = async (deletedId: string) => {
+        let result = await noteStore.deleteNote(deletedId);
+
+        // I think if this fails we get an error anyway
+        if (result) {
+            console.log("Deleted note: ", deletedId);
+        }
     }
 
     var onSelected = async (newValue:(note|string)) => {

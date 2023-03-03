@@ -25,6 +25,7 @@ export const useSearchStore = defineStore('search', () => {
         if (typeof noteObj === "string") {
             console.log("Calling the backend to create note: ", noteObj);
 
+            // TODO you probably wanna call the note store here
             let createdNote = await BackendPaths.Notes.CreateNote(authStore.jwtToken, { title: noteObj, thoughts: [], id: "" } as note);
 
             console.log("Created note: ", createdNote);

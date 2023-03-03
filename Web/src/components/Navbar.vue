@@ -34,7 +34,7 @@
     let loggedIn = ref(false);
 
     onMounted(async () => {
-        await noteStore.fetchNotes();
+        // await noteStore.fetchNotes();
 
         loggedIn.value = await authStore.verifyLoggedIn();
     });
