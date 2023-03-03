@@ -46,6 +46,11 @@ export class NoteService {
         return updatedNote;
     }
 
+    async FindOneByThoughtId(thoughtId: string): Promise<NoteDocument> {
+        // does this work?
+        return this.noteModel.findOne({"thoughts._id": new mongoose.Types.ObjectId(thoughtId)}).exec();
+    }
+
     async RenameNote(id: mongoose.Types.ObjectId, newName: string): Promise<Note> {
         let noteToUpdate = await this.noteModel.findById(id).exec();
 

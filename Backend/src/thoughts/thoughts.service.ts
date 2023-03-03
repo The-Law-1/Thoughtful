@@ -56,6 +56,14 @@ export class ThoughtsService {
 
     // delete one
     async DeleteOne(id: string): Promise<Thought> {
+
+        // find the note that has this thought
+        const noteContainingThought = await this.noteService.FindOneByThoughtId(id);
+        // remove the thought from the note
+        noteContainingThought.thoughts = noteContainingThought.thoughts.filter(thought => thought._id.toString() !== id);
+        noteContainingThought.save();
+
+
         const thought = await this.thoughtModel.findByIdAndRemove({_id: id}).exec();
 
         return thought;

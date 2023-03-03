@@ -68,7 +68,7 @@ export class ThoughtsController {
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
     @Delete(":id")
-    @HttpCode(204)
+    @HttpCode(200)
     async deleteOne(@Param("id") idParam: string): Promise<Thought> {
         return this.thoughtsService.DeleteOne(idParam);
     }
