@@ -12,6 +12,7 @@
                         :placeholder="'Search thoughts'"
                         :searchFunction="filterResults"
                         @onSelected="onSelected"
+                        @onDeleted="onDeleted"
                         :displayValues="(val:thought) => (val as thought) === null ? '' : val.content"
                         >
                     </GenericCombobox>
@@ -29,9 +30,11 @@
     import { useRouter } from "vue-router";
     import { thought } from "@/types/thought";
     import GenericCombobox from "@/components/GenericCombobox.vue";
+    import { useThoughtStore } from "@/stores/thoughts";
 
     let navBarStore = ref(useNavbarStore());
     let searchStore = useSearchStore();
+    let thoughtStore = useThoughtStore();
 
     let selectedOption = ref("");
 
@@ -45,6 +48,15 @@
         var newResults = await searchStore.filterThoughts(searchQuery);
         console.log("Got filteredResults: ", newResults);
         return newResults;
+    }
+
+    let onDeleted = async (deletedId: string) => {
+        let result = await thoughtStore.deleteThought(deletedId);
+
+        // I think if this fails we get an error anyway
+        if (result) {
+            console.log("Deleted thought: ", deletedId);
+        }
     }
 
     var onSelected = async (newValue:any) => {
