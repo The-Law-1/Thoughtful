@@ -1,5 +1,5 @@
 export interface thought {
-    id: string;
+    _id: string;
     content: string;
     noteId: string;
 }

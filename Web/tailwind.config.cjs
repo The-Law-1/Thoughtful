@@ -9,6 +9,7 @@ module.exports = {
         colors: {
             'snow': '#F5FEFD',
             'gunmetal': '#2C3539', // this is the trashiest name I've ever seen for a colour
+            'paper': "#FFF2D7" // this is coffee cream
         },
       
         // that is animation class

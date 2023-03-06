@@ -2,6 +2,7 @@ import NewThoughtModal from '@/components/NewThoughtModal.vue';
 import { note } from '@/types/note';
 import { thought } from '@/types/thought';
 import { defineStore, acceptHMRUpdate } from 'pinia';
+import { DefineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from './auth';
 import BackendPaths from './backendPaths';
@@ -40,15 +41,13 @@ export const useSearchStore = defineStore('search', () => {
         return filteredResults;
     }
     
-    async function thoughtSelected(thoughtObj:any, router: any = null) {
+    async function thoughtSelected(thoughtObj:thought, router: any = null) : Promise<any> {
 
         if (typeof thoughtObj === "string") {
-            // TODO in this case we want to ask the user what note he would like to add the thought to, so open a modal with another search bar, this time with different functions
-            // TODO return the name of your modal, i.e. "NewThoughtModal" which will take care of the rest, just pass it the current query (thought)
             return NewThoughtModal;
         } else {
             console.log("Navigating to note containing thought: ", thoughtObj.content);
-            // router.push({ path: "/note", query: { noteName:(newValue as string) } });
+            router.push({ path: `/note/${thoughtObj.noteId}` });
         }
         return null;
     }

@@ -17,6 +17,12 @@ export const useNoteStore = defineStore('notes', () => {
         return createdNote;
     }
 
+    async function getNoteById(noteId: string): Promise<note> {
+        let note = await BackendPaths.Notes.GetNoteById(authStore.jwtToken, noteId);
+
+        return note;
+    }
+
     // delete note
     async function deleteNote(noteId: string) : Promise<note> {
 
@@ -27,7 +33,8 @@ export const useNoteStore = defineStore('notes', () => {
 
     return {
         deleteNote,
-        createNote
+        createNote,
+        getNoteById
     }
 })
 

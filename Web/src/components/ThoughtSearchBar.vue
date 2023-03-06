@@ -62,9 +62,12 @@
     var onSelected = async (newValue:any) => {
         console.log("Selected new option: ", newValue);
 
-        
         // let modalSubmenu = await props.onSelectedFunction(newValue, router);
         let modalSubmenu = await searchStore.thoughtSelected(newValue, router);
+
+        // if there's no modalSubmenu, we have been redirected, so just go
+        if (!modalSubmenu)
+            return;
         
         selectedOption.value = newValue;
 
