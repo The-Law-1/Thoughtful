@@ -8,7 +8,7 @@
         @input="(evt:any) => handleInput(evt)"
         @keypress="(evt:any) => handleKeyPress(evt)"
         @keydown="(evt:any) => handleKeyDown(evt)"
-        class="caret-white outline-none shadow-none"
+        class="caret-black outline-none shadow-none text-lg"
         v-html="currentVal">
     </div>
 </template>

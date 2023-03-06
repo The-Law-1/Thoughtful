@@ -5,9 +5,11 @@
             v-if="note"
             style="min-width: calc(200px + 20rem)"
             class="bg-paper text-black rounded-lg text-left w-[900px] cursor-text overflow-y-auto"
-            @mousedown="(e:any) => e.preventDefault() /* prevent focus moving */" 
             @click="(evt) => addThoughtElement(evt)">
-            <h1 class="m-1 text-5xl font-bold mb-4">{{note.title}}</h1>
+            <!-- NOTE NAME -->
+            <input contenteditable="true" placeholder="You have to enter a name friend"
+                class="placeholder:text-slate-400 w-full bg-transparent h-20 text-black p-1 text-7xl outline-none shadow-none font-bold mb-4"
+                v-model="note.title">
             <div
                 class="m-2"
                 @mouseenter="() => mouseOverThoughts = true"
@@ -31,7 +33,7 @@
 <script setup lang="ts">
     import { useNavbarStore } from "@/stores/navbar";
     import { useNoteStore } from "@/stores/notes";
-    import { ref, computed, watch, onMounted } from 'vue';
+    import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
     import { useRoute } from "vue-router";
     import Thought from "@/components/Thought.vue";
     import { mapActions } from "pinia";
@@ -77,6 +79,25 @@
         note.value = await noteStore.getNoteById(noteId);
 
         console.log(note.value.thoughts);
+
+        // listen for keys
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "s" && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault(); // present "Save Page" from getting triggered.
+
+                // this.saveNote();
+
+                // call notestore and update note
+                console.log("Trying to save note: ", note.value);
+                noteStore.updateNote(note.value);
+            }
+        });
+    });
+
+    onUnmounted(() => {
+        document.removeEventListener('keydown', (evt) => {
+
+        });
     });
 
 

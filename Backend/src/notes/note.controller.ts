@@ -80,7 +80,7 @@ export class NoteController {
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
     @Patch(":id")
-    @HttpCode(204)
+    @HttpCode(200)
     async updateOne(@Param("id") idParam: string, @Body() createNoteDto: CreateNoteDto): Promise<Note> {
         // url decode id?
         // decodeURIComponent(idParam);
