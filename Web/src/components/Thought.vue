@@ -138,9 +138,12 @@
     }
 
     let focusThought = () => {
-        let myInput = currentThought as HTMLElement;
 
-        if (myInput.innerText.length > 0) {
+        // console.log("On created: focusing thought at index: ", this.thoughtIndex);
+        // this.focusThought();
+        let myInput = (currentThought.value) as HTMLElement;
+        
+        if (myInput.innerText && myInput.innerText.length > 0) {
             setEndOfContenteditable(myInput);
         }
         myInput.focus();

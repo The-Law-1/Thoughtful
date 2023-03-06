@@ -40,6 +40,9 @@ export class NoteService {
 
     // update one
     async UpdateOne(id: mongoose.Types.ObjectId, createNoteDto: CreateNoteDto): Promise<Note> {
+
+        // TODO go through all the thoughts, and if they don't have valid id, create them and give them a good id
+
         // * option new: true returns the updated document
         let updatedNote = this.noteModel.findByIdAndUpdate(id, createNoteDto, {new: true}).exec();
 

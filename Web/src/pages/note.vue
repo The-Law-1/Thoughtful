@@ -18,8 +18,8 @@
                     v-for="(thought, i) in note.thoughts"
                     @click="() => clickThought(i)"
                     @focusThought="(idx) => focusThought(idx)"
-                    :ref="'thought-'+ i"
-                    :key="`${thought._id}-${i}`"
+                    :ref="'thought-' + i"
+                    :key="`thoughtkey-${thought._id}-${i}`"
                     :focus-trigger="i === currentThoughtIndex ? 1 + focusTrigger : 0"
                     :note-name="note.title"
                     :thought-id="thought._id"
@@ -33,7 +33,7 @@
 <script setup lang="ts">
     import { useNavbarStore } from "@/stores/navbar";
     import { useNoteStore } from "@/stores/notes";
-    import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+    import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
     import { useRoute } from "vue-router";
     import Thought from "@/components/Thought.vue";
     import { mapActions } from "pinia";
@@ -50,9 +50,13 @@
 
     let focusThought = (idx:number) => {
         if (idx >= 0 && idx < note.value.thoughts.length) {
-            console.log("focus: Focusing thought at index: ", idx);
-            currentThoughtIndex.value = idx;
-            focusTrigger.value++;
+
+            // next tick cause we wait for the element to be rendered
+            nextTick(() => {
+                console.log("focus: Focusing thought at index: ", idx);
+                currentThoughtIndex.value = idx;
+                focusTrigger.value++;
+            })
         }
     }
 
@@ -65,7 +69,15 @@
     }
 
     let addThoughtElement = (evt:any) => {
-        if (mouseOverThoughts.value) {
+        // if our mouse is below the current thoughts div, add a new thought
+        if (!mouseOverThoughts.value) {
+            console.log("Adding new thought");
+            note.value.thoughts.push({
+                _id: "",
+                content: "",
+                noteId: note.value._id
+            });
+            focusThought(note.value.thoughts.length - 1);
         }
     }
 
