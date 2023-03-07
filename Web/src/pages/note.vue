@@ -50,11 +50,10 @@
 
     let noteThoughts = ref([] as any[]);
 
-    // TODO fill this by watching the noteThoughtsArray and getting index of changed item. If can't, follow an event from thought component
-    // TODO also if you create a thought, you need to update this array
     let thoughtsToUpdate = ref([] as any[]);
 
     // TODO if you remove a thought, you need to update this array, so probably event based right
+    // * could be more efficient to remove as you go, not all at once
     let thoughtsToRemove = ref([] as any[]);
 
     let currentThoughtIndex = ref(0);
@@ -98,11 +97,17 @@
     }
 
     let addThoughtElement = (evt:any) => {
-        // if our mouse is below the current thoughts div, add a new thought
-        if (!mouseOverThoughts.value) {
+        // if our mouse is below the current thoughts div, add a new thought, and our last thought isn't empty
+        if (!mouseOverThoughts.value && note.value.thoughts[note.value.thoughts.length - 1].content.length === 0) {
             console.log("Adding new thought");
             note.value.thoughts.push({
                 _id: "",
+                content: "",
+                noteId: note.value._id
+            });
+            // TODO could be a move to directly call create thought
+            thoughtsToUpdate.value.push({
+                _id: Math.random().toString(36).substring(7), // not perfect, but will work to find it in array to update. Then will hopefully be overwritten by the server
                 content: "",
                 noteId: note.value._id
             });
@@ -128,6 +133,10 @@
             if (e.key === "s" && (e.ctrlKey || e.metaKey)) {
                 e.preventDefault(); // present "Save Page" from getting triggered.
 
+                if (note.value.title === "") {
+                    alert("You have to enter a name for your note");
+                    return;
+                }
                 // this.saveNote();
 
                 // call notestore and update note

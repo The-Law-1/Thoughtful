@@ -9,7 +9,7 @@ import { NoteModule } from "src/notes/note.module";
     imports: [MongooseModule.forFeature([{ name: Thought.name, schema: ThoughtSchema }]), NoteModule],
     controllers: [ThoughtsController],
     providers: [ThoughtsService],
-
+    exports: [ThoughtsService]
 })
 
 export class ThoughtsModule {}

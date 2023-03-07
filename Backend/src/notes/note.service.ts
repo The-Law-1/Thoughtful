@@ -5,13 +5,12 @@ import { Thought } from "src/types/thought";
 import { CreateNoteDto } from "./dto/create-note.dto";
 import { UpdateNoteDto } from "./dto/update-note.dto";
 import { Note, NoteDocument } from "./schemas/note.schema";
-import { ThoughtsService } from "src/thoughts/thoughts.service";
 
 @Injectable()
 export class NoteService {
     constructor(
         @InjectModel(Note.name)
-        private noteModel: Model<NoteDocument>, private thoughtService: ThoughtsService ) {}
+        private noteModel: Model<NoteDocument>) {}
 
     async create(createNoteDto: CreateNoteDto): Promise<Note> {
         const createdNote = new this.noteModel(createNoteDto);

@@ -62,7 +62,7 @@ export class AppController {
         updateNoteDto.thoughtsToUpdate.forEach(async (thought: Thought , i) => {
             let isNew = thought._id == null;
 
-            let updatedThought = await this.thoughtService.UpdateOne(thought._id.toString(), thought);
+            let updatedThought = await this.thoughtService.UpdateOne(thought._id ? thought._id.toString() : null, thought);
 
             if (isNew) {
                 createdThoughts.push(updatedThought._id);
