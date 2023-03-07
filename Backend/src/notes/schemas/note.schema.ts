@@ -12,7 +12,7 @@ export class Note {
     title: string;
 
     @Prop()
-    thoughts: Thought[];
+    thoughts: mongoose.Types.ObjectId[];
 }
 
 export const NoteSchema = SchemaFactory.createForClass(Note);

@@ -23,8 +23,8 @@
                     :focus-trigger="i === currentThoughtIndex ? 1 + focusTrigger : 0"
                     :note-name="note.title"
                     :thought-id="thought._id"
-                    :initial-val="thought.content"
-                    :thought-index="i"/>
+                    :thought-index="i"
+                    v-model="thought.content"/>
             </div>
         </div>
     </article>

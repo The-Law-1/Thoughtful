@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, UseGu
 import { ApiBearerAuth } from "@nestjs/swagger";
 import { Types } from "mongoose";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
+import { Thought } from "src/types/thought";
 import { CreateNoteDto } from "./dto/create-note.dto";
 import { NoteService } from "./note.service";
 import { Note } from "./schemas/note.schema";
@@ -81,10 +82,10 @@ export class NoteController {
     @ApiBearerAuth()
     @Patch(":id")
     @HttpCode(200)
-    async updateOne(@Param("id") idParam: string, @Body() createNoteDto: CreateNoteDto): Promise<Note> {
+    async updateOne(@Param("id") idParam: string, @Body() createNoteDto: CreateNoteDto, @Body() updatedThoughts: Thought[]): Promise<Note> {
         // url decode id?
         // decodeURIComponent(idParam);
-        return this.noteService.UpdateOne(new Types.ObjectId(idParam), createNoteDto);
+        return this.noteService.UpdateOne(new Types.ObjectId(idParam), createNoteDto, updatedThoughts);
     }
 
     /**

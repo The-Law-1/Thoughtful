@@ -7,7 +7,7 @@ import { Note, NoteDocument } from "./schemas/note.schema";
 
 @Injectable()
 export class NoteService {
-    constructor(@InjectModel(Note.name) private noteModel: Model<NoteDocument>) {}
+    constructor(@InjectModel(Note.name) private noteModel: Model<NoteDocument>, ) {}
 
     async create(createNoteDto: CreateNoteDto): Promise<Note> {
         const createdNote = new this.noteModel(createNoteDto);
@@ -39,9 +39,10 @@ export class NoteService {
     }
 
     // update one
-    async UpdateOne(id: mongoose.Types.ObjectId, createNoteDto: CreateNoteDto): Promise<Note> {
+    async UpdateOne(id: mongoose.Types.ObjectId, createNoteDto: CreateNoteDto, updatedThoughts: Thought[]): Promise<Note> {
 
-        // TODO go through all the thoughts, and if they don't have valid id, create them and give them a good id
+        // update/create thoughts
+        // put the ids of the new thoughts into the note
 
         // * option new: true returns the updated document
         let updatedNote = this.noteModel.findByIdAndUpdate(id, createNoteDto, {new: true}).exec();
@@ -64,10 +65,10 @@ export class NoteService {
         return updatedNote;
     }
 
-    async AddThought(id: mongoose.Types.ObjectId, thought: Thought): Promise<Note> {
+    async AddThought(id: mongoose.Types.ObjectId, thoughtId: string): Promise<Note> {
         let noteToUpdate = await this.noteModel.findById(id).exec();
 
-        noteToUpdate.thoughts.push(thought);
+        noteToUpdate.thoughts.push(new mongoose.Types.ObjectId(thoughtId));
 
         let updatedNote = await noteToUpdate.save();
 

@@ -8,8 +8,7 @@
         @input="(evt:any) => handleInput(evt)"
         @keypress="(evt:any) => handleKeyPress(evt)"
         @keydown="(evt:any) => handleKeyDown(evt)"
-        class="caret-black outline-none shadow-none text-lg"
-        v-html="currentVal">
+        class="caret-black outline-none shadow-none text-lg">
     </div>
 </template>
 
@@ -27,7 +26,7 @@
     let noteStore = ref(useNoteStore());
 
     const props = defineProps({
-        initialVal: {
+        modelValue: {
             type: String,
             default: "",
         },
@@ -50,29 +49,17 @@
     });
 
     const emit = defineEmits<{
-        (event: 'focusThought', idx:number): void
+        (event: 'focusThought', idx:number): void,
+        (event: "update:modelValue", val:string): void,
     }>();
 
-    let currentVal = ref(props.initialVal);
-
     let currentThought = ref(null);
-
-    let saveTimeout = null as any;
-    let currentSaveID = "";
 
     let handleInput = ref((evt:any) => {
         let newVal = evt.target.innerText;
 
-        if (saveTimeout) {
-            clearTimeout(saveTimeout);
-        }
-        currentSaveID = props.thoughtId;
-        saveTimeout = setTimeout(() => {
-            // * only update if we're sure it's the same thought, no glitching
-            if (currentSaveID === props.thoughtId) {
-                // noteStore.value.updateThought(props.noteName, props.thoughtIndex, newVal);
-            }
-        }, 500);
+        emit("update:modelValue", newVal);
+        // value.value = newVal;
     });
 
     let handleKeyDown = ref((evt:any) => {
@@ -101,7 +88,7 @@
             
             let val = evt.target.innerText.trim();
 
-            currentVal.value = val;
+            // value.value = val;
 
             evt.target.innerText = val;
             if (val.length > 0) {
@@ -150,7 +137,8 @@
     }
 
     onMounted(() => {
-        if (props.initialVal.length === 0) {
+        currentThought.value.innerText = props.modelValue;
+        if (props.modelValue.length === 0) {
             nextTick(() => {
                 // console.log("On created: focusing thought at index: ", this.thoughtIndex);
                 // this.focusThought();

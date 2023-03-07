@@ -4,7 +4,7 @@ import { InjectModel, Schema } from "@nestjs/mongoose";
 import { Thought, ThoughtDocument } from "./schemas/thought.schema";
 import { CreateThoughtDto } from "./dto/create-thought.dto";
 import { NoteService } from "src/notes/note.service";
-import { NoteDocument } from "src/notes/schemas/note.schema";
+import { Note, NoteDocument } from "src/notes/schemas/note.schema";
 
 @Injectable()
 export class ThoughtsService {
@@ -20,15 +20,19 @@ export class ThoughtsService {
             // add the noteId to the thought
             createdThought.noteId = newNote._id;
 
-            await this.noteService.AddThought(newNote._id, {_id: createdThought._id, content: createThoughtDto.content, noteId: newNote._id });
+            await this.noteService.AddThought(newNote._id, createdThought._id.toString());
 
         } else {
             // find the note by the noteId
             const note = await this.noteService.GetOne(createThoughtDto.noteId);
             // add the thought to the note
-            note.thoughts.push(createdThought);
+            // note.thoughts.push(createdThought._id);
+
+            createdThought.noteId = note._id;
+
+            await this.noteService.AddThought(note._id, createdThought._id.toString());
             // save the note
-            await this.noteService.UpdateOne(note._id, {title: note.title, thoughts: note.thoughts});
+            // await this.noteService.UpdateOne(note._id, {title: note.title, thoughts: note.thoughts.map(x =>  x.toString())});
         }
 
         createdThought.save();
@@ -44,23 +48,26 @@ export class ThoughtsService {
         if (notes.length > 0) {
             let noteToChange = notes[0];
             // add the thought to the note
-            noteToChange.thoughts.push(createdThought);
-            // save the note
-            await this.noteService.UpdateOne(noteToChange._id, {title: noteToChange.title, thoughts: noteToChange.thoughts});
+
+            this.noteService.AddThought(noteToChange._id, createdThought._id.toString());
         } else {
 
-            
             // create a new note
             const newNote = await this.noteService.create({title: noteTitle, thoughts: [] });
             // add the noteId to the thought
             createdThought.noteId = newNote._id;
 
-            await this.noteService.AddThought(newNote._id, {_id: createdThought._id, content: createThoughtDto.content, noteId: newNote._id });
+            await this.noteService.AddThought(newNote._id, createdThought._id.toString());
         }
         createdThought.save();
 
         return createdThought;
     }
+
+    async FindThoughtsForNoteId(id: mongoose.Types.ObjectId): Promise<Thought[]> {
+        return this.thoughtModel.find({ noteId: id}).exec();
+    }
+
 
     // I hardly see a use for this but you never know
     async FindAll(): Promise<Thought[]> {

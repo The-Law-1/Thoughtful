@@ -7,6 +7,7 @@ import { Thought, ThoughtSchema } from "./schemas/thought.schema";
 import { CreateThoughtDto } from "./dto/create-thought.dto";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { ApiBearerAuth } from "@nestjs/swagger";
+import mongoose from "mongoose";
 
 @Controller({ path: "thoughts" })
 export class ThoughtsController {
@@ -85,5 +86,18 @@ export class ThoughtsController {
     @HttpCode(200)
     async deleteOne(@Param("id") idParam: string): Promise<Thought> {
         return this.thoughtsService.DeleteOne(idParam);
+    }
+
+    /**
+     * Get thoughts in note.
+     * @param noteId id of note we want the thoughts of.
+     * @returns List of thoughts.
+     */
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @Get("note/:noteId")
+    @HttpCode(200)
+    async GetThoughtsForNote(noteId: string): Promise<Thought[]> {
+        return this.thoughtsService.FindThoughtsForNoteId(new mongoose.Types.ObjectId(noteId));
     }
 }
