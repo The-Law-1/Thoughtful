@@ -21,6 +21,12 @@ export const useThoughtStore = defineStore('thoughts', () => {
         return createdThought;
     }
 
+    async function getThoughtsForNote(noteId: string): Promise<thought[]> {
+        let thoughts = await BackendPaths.Thoughts.GetThoughtsForNote(authStore.jwtToken, noteId);
+    
+        return thoughts;
+    }
+
     // delete thought
     async function deleteThought(thoughtId: string) : Promise<thought> {
         let deletedThought = await BackendPaths.Thoughts.DeleteThoughtById(authStore.jwtToken, thoughtId);
@@ -31,7 +37,8 @@ export const useThoughtStore = defineStore('thoughts', () => {
     return {
         createThought,
         deleteThought,
-        createThoughtWithNoteTitle
+        createThoughtWithNoteTitle,
+        getThoughtsForNote
     }
 });
 

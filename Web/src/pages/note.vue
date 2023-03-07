@@ -15,7 +15,7 @@
                 @mouseenter="() => mouseOverThoughts = true"
                 @mouseleave="() => mouseOverThoughts = false">
                 <Thought
-                    v-for="(thought, i) in note.thoughts"
+                    v-for="(thought, i) in noteThoughts"
                     @click="() => clickThought(i)"
                     @focusThought="(idx) => focusThought(idx)"
                     :ref="'thought-' + i"
@@ -38,12 +38,25 @@
     import Thought from "@/components/Thought.vue";
     import { mapActions } from "pinia";
     import { note } from "@/types/note";
+    import { thought } from "@/types/thought";
+    import { useThoughtStore } from "@/stores/thoughts";
 
     let navBarStore = ref(useNavbarStore());
 
     let noteStore = useNoteStore();
+    let thoughtStore = useThoughtStore();
     let route = useRoute();
     let note = ref({} as note);
+
+    let noteThoughts = ref([] as thought[]);
+
+    // fill this by watching the noteThoughtsArray and getting index of changed item. If can't, follow an event from thought component
+    // also if you create a thought, you need to update this array
+    let thoughtsToUpdate = ref([] as thought[]);
+
+    // if you remove a thought, you need to update this array
+    let thoughtsToRemove = ref([] as thought[]);
+
     let currentThoughtIndex = ref(0);
     let focusTrigger = ref(0);
     let mouseOverThoughts = ref(false);
@@ -91,6 +104,8 @@
         note.value = await noteStore.getNoteById(noteId);
 
         console.log(note.value.thoughts);
+
+        noteThoughts.value = await thoughtStore.getThoughtsForNote(noteId);
 
         // listen for keys
         document.addEventListener('keydown', (e) => {

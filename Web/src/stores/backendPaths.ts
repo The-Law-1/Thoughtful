@@ -1,5 +1,6 @@
 import { note } from "@/types/note";
 import { thought } from "@/types/thought";
+import { Stringifier } from "postcss";
 
 function safeJsonParse(str: string) {
     try {
@@ -229,6 +230,26 @@ export default class BackendPath {
 
     public static Thoughts = class {
         static readonly PATH: string = `${BackendPath.BASE_URL}/thoughts`;
+
+        public static async GetThoughtsForNote(token: string, noteId: string) : Promise<thought[]> {
+            const path = `${this.PATH}/note/${noteId}`;
+
+            const res = await fetch(path, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            if (!res.ok) {
+                const data = await res.text();
+                return Promise.reject({
+                    name: `${res.status}`,
+                    message: data ? safeJsonParse(data) ?? data : null,
+                } as Error);
+            }
+            return await res.json();
+        }
 
         // either adds a thought to a note or creates a new note with the thought
         public static async CreateThoughtOnNote(token: string, newThought: thought, noteTitle: string) {

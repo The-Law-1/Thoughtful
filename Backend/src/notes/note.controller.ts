@@ -82,6 +82,7 @@ export class NoteController {
     @ApiBearerAuth()
     @Patch(":id")
     @HttpCode(200)
+    // TODO also should include thoughts to delete 
     async updateOne(@Param("id") idParam: string, @Body() createNoteDto: CreateNoteDto, @Body() updatedThoughts: Thought[]): Promise<Note> {
         // url decode id?
         // decodeURIComponent(idParam);
