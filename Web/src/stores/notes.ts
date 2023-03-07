@@ -1,4 +1,5 @@
 import { note } from '@/types/note';
+import { thought } from '@/types/thought';
 import { acceptHMRUpdate, defineStore } from 'pinia';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from './auth';
@@ -23,8 +24,8 @@ export const useNoteStore = defineStore('notes', () => {
         return note;
     }
 
-    async function updateNote(noteObj: note): Promise<note> {
-        let updatedNote = await BackendPaths.Notes.UpdateNoteById(authStore.jwtToken, noteObj._id, noteObj);
+    async function updateNote(noteObj: note, updatedThoughts: thought[], deletedThoughts: thought[]): Promise<note> {
+        let updatedNote = await BackendPaths.Notes.UpdateNoteById(authStore.jwtToken, noteObj._id, noteObj, updatedThoughts, deletedThoughts);
 
         return updatedNote;
     }

@@ -21,6 +21,7 @@
 
 <script setup lang="ts">
     import { useNoteStore } from "@/stores/notes";
+    import { thought } from "@/types/thought";
     import { ref, computed, watch, defineComponent, nextTick, onMounted } from 'vue';
 
     let noteStore = ref(useNoteStore());
@@ -51,6 +52,7 @@
     const emit = defineEmits<{
         (event: 'focusThought', idx:number): void,
         (event: "update:modelValue", val:string): void,
+        (event: "thoughtUpdated", value:string): void
     }>();
 
     let currentThought = ref(null);
@@ -59,6 +61,7 @@
         let newVal = evt.target.innerText;
 
         emit("update:modelValue", newVal);
+        emit("thoughtUpdated", newVal);
         // value.value = newVal;
     });
 

@@ -4,6 +4,7 @@ import { Types } from "mongoose";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { Thought } from "src/types/thought";
 import { CreateNoteDto } from "./dto/create-note.dto";
+import { UpdateNoteDto } from "./dto/update-note.dto";
 import { NoteService } from "./note.service";
 import { Note } from "./schemas/note.schema";
 
@@ -72,22 +73,21 @@ export class NoteController {
         return this.noteService.DeleteOne(idParam);
     }
 
-    /**
-     * Update a note
-     * @param idParam id of the note to update
-     * @param createNoteDto update note object
-     * @returns updated note
-     */
-    @UseGuards(JwtAuthGuard)
-    @ApiBearerAuth()
-    @Patch(":id")
-    @HttpCode(200)
-    // TODO also should include thoughts to delete 
-    async updateOne(@Param("id") idParam: string, @Body() createNoteDto: CreateNoteDto, @Body() updatedThoughts: Thought[]): Promise<Note> {
-        // url decode id?
-        // decodeURIComponent(idParam);
-        return this.noteService.UpdateOne(new Types.ObjectId(idParam), createNoteDto, updatedThoughts);
-    }
+    // /**
+    //  * Update a note
+    //  * @param idParam id of the note to update
+    //  * @param createNoteDto update note object
+    //  * @returns updated note
+    //  */
+    // @UseGuards(JwtAuthGuard)
+    // @ApiBearerAuth()
+    // @Patch(":id")
+    // @HttpCode(200)
+    // async updateOne(@Param("id") idParam: string, @Body() updateNoteDto: UpdateNoteDto): Promise<Note> {
+    //     // url decode id?
+    //     // decodeURIComponent(idParam);
+    //     return this.noteService.UpdateOne(new Types.ObjectId(idParam), updateNoteDto);
+    // }
 
     /**
      * Rename a note

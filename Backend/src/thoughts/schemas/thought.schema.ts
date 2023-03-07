@@ -5,6 +5,8 @@ export type ThoughtDocument = HydratedDocument<Thought>;
 
 @Schema()
 export class Thought {
+    _id: mongoose.Types.ObjectId;
+
     @Prop({required: true})
     content: string;
 

@@ -18,6 +18,7 @@
                     v-for="(thought, i) in noteThoughts"
                     @click="() => clickThought(i)"
                     @focusThought="(idx) => focusThought(idx)"
+                    @thoughtUpdated="(val) => handleThoughtUpdated(thought._id, val)"
                     :ref="'thought-' + i"
                     :key="`thoughtkey-${thought._id}-${i}`"
                     :focus-trigger="i === currentThoughtIndex ? 1 + focusTrigger : 0"
@@ -38,7 +39,6 @@
     import Thought from "@/components/Thought.vue";
     import { mapActions } from "pinia";
     import { note } from "@/types/note";
-    import { thought } from "@/types/thought";
     import { useThoughtStore } from "@/stores/thoughts";
 
     let navBarStore = ref(useNavbarStore());
@@ -48,18 +48,34 @@
     let route = useRoute();
     let note = ref({} as note);
 
-    let noteThoughts = ref([] as thought[]);
+    let noteThoughts = ref([] as any[]);
 
-    // fill this by watching the noteThoughtsArray and getting index of changed item. If can't, follow an event from thought component
-    // also if you create a thought, you need to update this array
-    let thoughtsToUpdate = ref([] as thought[]);
+    // TODO fill this by watching the noteThoughtsArray and getting index of changed item. If can't, follow an event from thought component
+    // TODO also if you create a thought, you need to update this array
+    let thoughtsToUpdate = ref([] as any[]);
 
-    // if you remove a thought, you need to update this array
-    let thoughtsToRemove = ref([] as thought[]);
+    // TODO if you remove a thought, you need to update this array, so probably event based right
+    let thoughtsToRemove = ref([] as any[]);
 
     let currentThoughtIndex = ref(0);
     let focusTrigger = ref(0);
     let mouseOverThoughts = ref(false);
+
+    let handleThoughtUpdated = (id:string, val:string) => {
+        console.log("Thought updated: ", val);
+
+        let idx = thoughtsToUpdate.value.findIndex(t => t._id === id);
+        if (idx >= 0) {
+            thoughtsToUpdate.value[idx].content = val;
+        } else {
+            thoughtsToUpdate.value.push({
+                _id: id,
+                content: val,
+                noteId: note.value._id
+            });
+        }
+
+    }
 
     let focusThought = (idx:number) => {
         if (idx >= 0 && idx < note.value.thoughts.length) {
@@ -108,7 +124,7 @@
         noteThoughts.value = await thoughtStore.getThoughtsForNote(noteId);
 
         // listen for keys
-        document.addEventListener('keydown', (e) => {
+        document.addEventListener('keydown', async (e) => {
             if (e.key === "s" && (e.ctrlKey || e.metaKey)) {
                 e.preventDefault(); // present "Save Page" from getting triggered.
 
@@ -116,7 +132,9 @@
 
                 // call notestore and update note
                 console.log("Trying to save note: ", note.value);
-                noteStore.updateNote(note.value);
+                await noteStore.updateNote(note.value, thoughtsToUpdate.value, thoughtsToRemove.value);
+                thoughtsToRemove.value = [];
+                thoughtsToUpdate.value = [];
             }
         });
     });

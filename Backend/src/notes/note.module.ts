@@ -1,5 +1,6 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
+import { ThoughtsModule } from "src/thoughts/thoughts.module";
 import { NoteController } from "./note.controller";
 import { NoteService } from "./note.service";
 import { Note, NoteSchema } from "./schemas/note.schema";

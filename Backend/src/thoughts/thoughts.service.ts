@@ -1,5 +1,5 @@
 import mongoose, { Model, Types } from "mongoose";
-import { Injectable } from "@nestjs/common";
+import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { InjectModel, Schema } from "@nestjs/mongoose";
 import { Thought, ThoughtDocument } from "./schemas/thought.schema";
 import { CreateThoughtDto } from "./dto/create-thought.dto";
@@ -8,7 +8,9 @@ import { Note, NoteDocument } from "src/notes/schemas/note.schema";
 
 @Injectable()
 export class ThoughtsService {
-    constructor(@InjectModel(Thought.name) private thoughtModel: Model<ThoughtDocument>, private noteService: NoteService) {}
+    constructor(
+        @InjectModel(Thought.name)
+        private thoughtModel: Model<ThoughtDocument>, private noteService: NoteService) {}
 
     async create(createThoughtDto: CreateThoughtDto): Promise<Thought> {
         const createdThought = new this.thoughtModel(createThoughtDto);
@@ -85,6 +87,20 @@ export class ThoughtsService {
     // get
     async GetOne(id: string): Promise<Thought> {
         return this.thoughtModel.findById(id).exec();
+    }
+
+    // update
+    async UpdateOne(id: string, thought: Thought): Promise<Thought> {
+        let thoughtToUpdate = await this.thoughtModel.findById(id).exec();
+
+        if (thoughtToUpdate === null) {
+            return await this.create(thought);
+        }
+
+        thoughtToUpdate.content = thought.content;
+        thoughtToUpdate.noteId = thought.noteId;
+
+        return await thoughtToUpdate.save();
     }
 
     // delete one

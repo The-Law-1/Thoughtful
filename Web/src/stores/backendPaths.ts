@@ -184,7 +184,7 @@ export default class BackendPath {
         }
 
         // update
-        public static async UpdateNoteById(token: string, noteId: string, updatedNote: note): Promise<note> {
+        public static async UpdateNoteById(token: string, noteId: string, updatedNote: note, thoughtsToUpdate: thought[], thoughtsToRemove: thought[]): Promise<note> {
             const path = `${this.PATH}/${noteId}`;
 
             const res = await fetch(path, {
@@ -193,7 +193,7 @@ export default class BackendPath {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ title: updatedNote.title, thoughts: updatedNote.thoughts}),
+                body: JSON.stringify({ title: updatedNote.title, thoughtsToUpdate, thoughtsToRemove}),
             });
 
             if (!res.ok) {
