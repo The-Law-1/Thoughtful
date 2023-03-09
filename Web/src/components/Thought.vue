@@ -72,9 +72,9 @@ import { setUncaughtExceptionCaptureCallback } from "process";
         // down key, and up key can navigate thoughts
         let cursorIndex = cursorPosition();
         // if we are at the end or the start of a though
-        console.log(getPositionInLine());
+        // console.log(getPositionInLine());
         let endOfLinePosition = 108; // ugly hack but I can't calculate the end of line position
-        if ((evt.keyCode === 40 && evt.target.innerText.length === cursorIndex) || (evt.keyCode === 38 && cursorIndex <= endOfLinePosition)) {
+        if ((evt.keyCode === 40 && cursorIndex >= evt.target.innerText.length - endOfLinePosition) || (evt.keyCode === 38 && cursorIndex <= endOfLinePosition)) {
             // if caret is at end of text
             evt.preventDefault();
             let direction = evt.keyCode === 40 ? 1 : -1;
@@ -154,14 +154,14 @@ import { setUncaughtExceptionCaptureCallback } from "process";
         }
     }
 
-    let focusThought = () => {
+    let focusThought = (caretEnd:boolean = false) => {
 
         // console.log("On created: focusing thought at index: ", this.thoughtIndex);
         // this.focusThought();
         let myInput = (currentThought.value) as HTMLElement;
 
-        if (myInput.innerText && myInput.innerText.length > 0) {
-            // setEndOfContenteditable(myInput);
+        if (myInput.innerText && myInput.innerText.length > 0 && caretEnd) {
+            placeCaretAtEnd(myInput);
         }
         myInput.focus();
     }
@@ -177,8 +177,15 @@ import { setUncaughtExceptionCaptureCallback } from "process";
     }),
 
     watch(() => props.focusTrigger, (newVal) => {
+        // console.log("Watch focus trigger: ", newVal);
+
         if (newVal > 0)
             focusThought();
+
+        if (newVal < 0) {
+            focusThought(true);
+            // console.log("Focusing thought at end of string");
+        }
     });
 
 

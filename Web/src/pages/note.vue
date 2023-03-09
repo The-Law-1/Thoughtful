@@ -23,7 +23,7 @@
                     @thoughtInserted="(idx) => insertThought(idx)"
                     :ref="'thought-' + i"
                     :key="`thoughtkey-${thought._id}-${i}`"
-                    :focus-trigger="i === currentThoughtIndex ? 1 + focusTrigger : 0"
+                    :focus-trigger="i === currentThoughtIndex ? focusTrigger : 0"
                     :note-name="note.title"
                     :thought-index="i"
                     v-model="thought.content"/>
@@ -53,7 +53,11 @@
 
     let thoughtsToUpdate = ref([] as any[]);
 
+    // helps for inserting thoughts
     let currentThoughtIndex = ref(0);
+
+    // positive value -> focus and place caret randomly
+    // negative value -> focus and place caret at the end
     let focusTrigger = ref(0);
     let mouseOverThoughts = ref(false);
 
@@ -77,9 +81,13 @@
 
             // next tick cause we wait for the element to be rendered
             nextTick(() => {
-                console.log("focus: Focusing thought at index: ", idx);
+                // console.log("focus: Focusing thought at index: ", idx, focusTrigger.value);
                 currentThoughtIndex.value = idx;
-                focusTrigger.value++;
+
+                // give focustrigger a new negative value
+                focusTrigger.value = -Math.abs(focusTrigger.value) - 1;
+                // console.log("New focustrigger: ", idx, focusTrigger.value);
+
             });
         }
     }
@@ -88,7 +96,8 @@
         if (currentThoughtIndex.value !== i) {
             console.log("click: Focusing thought at index: ", i);
             currentThoughtIndex.value = i;
-            focusTrigger.value++;
+
+            focusTrigger.value = Math.abs(focusTrigger.value) + 1;
         }
     }
 
