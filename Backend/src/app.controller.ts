@@ -1,7 +1,9 @@
-import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Patch, Post, Request, UnauthorizedException, UseGuards } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Delete, Get, Header, HttpCode, HttpException, HttpStatus, Param, Patch, Post, Request, StreamableFile, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
-import { ApiBearerAuth } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOkResponse } from "@nestjs/swagger";
+import { createReadStream, readdirSync, rmSync } from "fs";
 import { Types } from "mongoose";
+import { join } from "path";
 import { AppService } from "./app.service";
 import { AuthService } from "./auth/auth.service";
 import { AuthDto } from "./auth/dto/auth.dto";
@@ -11,6 +13,7 @@ import { NoteService } from "./notes/note.service";
 import { Note } from "./notes/schemas/note.schema";
 import { ThoughtsService } from "./thoughts/thoughts.service";
 import { Thought } from "./types/thought";
+const fs = require('fs');
 
 @Controller()
 export class AppController {
@@ -80,6 +83,76 @@ export class AppController {
         let deletedThoughts = await this.thoughtService.DeleteAllWithNoteId(idParam);
 
         return this.noteService.DeleteOne(idParam);
+    }
+
+    /**
+     * Export a note as a html file
+     * @param idParam Note ID
+     * @returns a html file??
+     */
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @Get("notes/export/html/:id")
+    @Header('Content-Type', 'application/json')
+    // @Header('Content-Disposition', 'attachment; filename="package.json"')
+    async exportNoteHtml(@Param("id") idParam: string): Promise<StreamableFile> {
+        let note = await this.noteService.GetOne(idParam);
+        let thoughts = await this.thoughtService.FindThoughtsForNoteId(new Types.ObjectId(idParam));
+
+        let html = `
+<html>
+    <head>
+        <title>${note.title}</title>
+    </head>
+    <body>
+        <h1>${note.title}</h1>
+        `;
+
+        thoughts.forEach(thought => {
+            html += `<p>${thought.content}</p>`;
+        });
+
+        html += `
+    </body>
+</html>
+        `;
+
+        // write to local file
+        await fs.writeFile("./exports/" + note.title + ".html", html, (err) => {
+            console.log("error: " + err);
+        });
+
+        // return the file
+        const file = createReadStream(join(process.cwd(), "exports/" + note.title + ".html"));
+
+        let stream = new StreamableFile(file);
+
+        // delete file after?
+        // fs.unlink(note.title + ".html", (err) => {
+        //     if (err) {
+        //         console.error(err)
+        //     }
+        // });
+
+        return stream;
+    }
+
+    /**
+     * route to cleanup exports folder
+     */
+    @Get("notes/export/cleanup")
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @HttpCode(200)
+    async cleanupExports() {
+        const dir = "exports";
+
+        readdirSync(dir).forEach(f => {
+            if (f !== ".gitkeep")
+                rmSync(`${dir}/${f}`);
+        });
+
+        return ApiOkResponse();
     }
 
     @UseGuards(JwtAuthGuard)
