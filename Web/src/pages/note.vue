@@ -94,9 +94,8 @@
 
     let addThoughtElement = async (evt:any) => {
         // if our mouse is below the current thoughts div, add a new thought, and our last thought isn't empty
-        if (!mouseOverThoughts.value && note.value.thoughts[note.value.thoughts.length - 1].content.length === 0) {
+        if (!mouseOverThoughts.value && noteThoughts.value[noteThoughts.value.length - 1].content.length !== 0) {
             console.log("Adding new thought");
-            
 
             let newThought = await thoughtStore.createThought({
                 _id: "",

@@ -111,7 +111,7 @@ export class ThoughtsController {
     @ApiBearerAuth()
     @Get("note/:noteId")
     @HttpCode(200)
-    async GetThoughtsForNote(noteId: string): Promise<Thought[]> {
+    async GetThoughtsForNote(@Param("noteId") noteId: string): Promise<Thought[]> {
         return this.thoughtsService.FindThoughtsForNoteId(new mongoose.Types.ObjectId(noteId));
     }
 }

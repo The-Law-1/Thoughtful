@@ -7,7 +7,7 @@ export type ThoughtDocument = HydratedDocument<Thought>;
 export class Thought {
     _id: mongoose.Types.ObjectId;
 
-    @Prop({required: true})
+    @Prop({required: false}) // * can create an empty thought
     content: string;
 
     @Prop({type: mongoose.Schema.Types.ObjectId, ref: "noteId", required: true})
