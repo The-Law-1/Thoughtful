@@ -52,7 +52,9 @@
     const emit = defineEmits<{
         (event: 'focusThought', idx:number): void,
         (event: "update:modelValue", val:string): void,
-        (event: "thoughtUpdated", value:string): void
+        (event: "thoughtUpdated", value:string): void,
+        (event: "thoughtDeleted", value:string): void,
+        (event: "thoughtInserted", idx:number): void,
     }>();
 
     let currentThought = ref(null);
@@ -73,6 +75,7 @@
         if (evt.key === "Backspace" && evt.target.innerText.length === 0) {
             evt.preventDefault();
             console.log("Removing thought at index: ", props.thoughtIndex);
+            emit("thoughtDeleted", props.thoughtId);
             // noteStore.value.removeThought(props.noteName, props.thoughtIndex);
 
             // * tell notes to focus their last thought
@@ -88,23 +91,10 @@
             evt.preventDefault();
             evt.focus = false;
             // remove trailing newline
-            
-            let val = evt.target.innerText.trim();
 
-            // value.value = val;
+            // emit add thought
+            emit("thoughtInserted", props.thoughtIndex + 1);
 
-            evt.target.innerText = val;
-            if (val.length > 0) {
-                // noteStore.value.updateThought(props.noteName, props.thoughtIndex, val);
-            }
-            console.log("Inserting thought at index: ", props.thoughtIndex + 1);
-            // noteStore.value.insertThought(props.noteName, props.thoughtIndex + 1, "");
-
-            // * wait for new thought to appear
-            nextTick(() => {
-                emit("focusThought", props.thoughtIndex + 1);
-            });
-            // noteStore.value.addThought(props.noteName, '');
             return;
         }
     });

@@ -19,6 +19,8 @@
                     @click="() => clickThought(i)"
                     @focusThought="(idx) => focusThought(idx)"
                     @thoughtUpdated="(val) => handleThoughtUpdated(thought._id, val)"
+                    @thoughtDeleted="(id) => deleteThought(id)"
+                    @thoughtInserted="(idx) => insertThought(idx)"
                     :ref="'thought-' + i"
                     :key="`thoughtkey-${thought._id}-${i}`"
                     :focus-trigger="i === currentThoughtIndex ? 1 + focusTrigger : 0"
@@ -69,7 +71,6 @@
                 noteId: note.value._id
             });
         }
-
     }
 
     let focusThought = (idx:number) => {
@@ -89,6 +90,37 @@
             console.log("click: Focusing thought at index: ", i);
             currentThoughtIndex.value = i;
             focusTrigger.value++;
+        }
+    }
+
+    let deleteThought = async (id:string) => {
+        await thoughtStore.deleteThought(id);
+
+        let idx = noteThoughts.value.findIndex(t => t._id === id);
+
+        if (idx >= 0) {
+            noteThoughts.value.splice(idx, 1);
+            note.value.thoughts = noteThoughts.value;
+
+            focusThought(currentThoughtIndex.value - 1);
+        }
+    }
+
+    let insertThought = async (idx:number) => {
+        let newThought = await thoughtStore.createThought({
+            _id: "",
+            content: "",
+            noteId: note.value._id
+        });
+
+        // make sure this went through
+        if (newThought !== null) {
+            noteThoughts.value.splice(idx, 0, newThought);
+            note.value.thoughts = noteThoughts.value;
+
+            focusThought(idx);
+        } else {
+            console.error("Failed to create thought");
         }
     }
 
@@ -113,6 +145,10 @@
             } else {
                 console.error("Failed to create thought");
             }
+        }
+        if (!mouseOverThoughts.value && noteThoughts.value[noteThoughts.value.length - 1].content.length === 0) {
+            console.log("Thought is empty, not adding new thought");
+            focusThought(note.value.thoughts.length - 1);
         }
     }
 
@@ -144,6 +180,7 @@
                 console.log("Trying to save note: ", note.value);
 
                 // await thoughtStore.updated(thoughtsToUpdate.value);
+                note.value.thoughts = noteThoughts.value;
 
                 await noteStore.updateNote(note.value, thoughtsToUpdate.value);
                 thoughtsToUpdate.value = [];

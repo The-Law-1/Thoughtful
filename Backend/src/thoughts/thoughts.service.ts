@@ -1,5 +1,5 @@
 import mongoose, { Model, Types } from "mongoose";
-import { forwardRef, Inject, Injectable } from "@nestjs/common";
+import { BadRequestException, forwardRef, Inject, Injectable } from "@nestjs/common";
 import { InjectModel, Schema } from "@nestjs/mongoose";
 import { Thought, ThoughtDocument } from "./schemas/thought.schema";
 import { CreateThoughtDto } from "./dto/create-thought.dto";
@@ -111,14 +111,14 @@ export class ThoughtsService {
     // delete one
     async DeleteOne(id: string): Promise<Thought> {
 
-        // find the note that has this thought
-        const noteContainingThought = await this.noteService.FindOneByThoughtId(id);
-        // remove the thought from the note
-        noteContainingThought.thoughts = noteContainingThought.thoughts.filter(thought => thought._id.toString() !== id);
-        noteContainingThought.save();
-
-
         const thought = await this.thoughtModel.findByIdAndRemove({_id: id}).exec();
+
+        if (thought === null)
+            throw new BadRequestException("Thought not found");
+
+        let updatedNote = await this.noteService.RemoveThought(thought.noteId, id);
+        if (updatedNote === null)
+            throw new BadRequestException("Note not found");
 
         return thought;
     }

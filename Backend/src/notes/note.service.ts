@@ -52,8 +52,19 @@ export class NoteService {
     //     return await noteToUpdate.save();
     // }
 
+    async RemoveThought(noteId:string, thoughtId: string): Promise<Note> {
+        let noteDocument = await this.noteModel.findById(noteId).exec();
+
+        if (!noteDocument)
+            throw null;
+
+        noteDocument.thoughts = noteDocument.thoughts.filter(x => x.toString() !== thoughtId);
+
+        return await noteDocument.save();
+    }
+
     async FindOneByThoughtId(thoughtId: string): Promise<NoteDocument> {
-        // does this work?
+        // does this work? ! it doesn't
         return this.noteModel.findOne({"thoughts._id": new mongoose.Types.ObjectId(thoughtId)}).exec();
     }
 
