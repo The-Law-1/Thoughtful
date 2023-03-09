@@ -5,6 +5,7 @@ import { Thought, ThoughtDocument } from "./schemas/thought.schema";
 import { CreateThoughtDto } from "./dto/create-thought.dto";
 import { NoteService } from "src/notes/note.service";
 import { Note, NoteDocument } from "src/notes/schemas/note.schema";
+import { UpdateThoughtDto } from "./dto/update-thought.dto";
 
 @Injectable()
 export class ThoughtsService {
@@ -87,6 +88,10 @@ export class ThoughtsService {
     // get
     async GetOne(id: string): Promise<Thought> {
         return this.thoughtModel.findById(id).exec();
+    }
+
+    async UpdateMultiple(thoughts: UpdateThoughtDto[]): Promise<Thought[]> {
+        return await Promise.all(thoughts.map(thought => this.UpdateOne(thought._id.toString(), { _id: new Types.ObjectId(thought._id), content: thought.content, noteId: thought.noteId })));
     }
 
     // update

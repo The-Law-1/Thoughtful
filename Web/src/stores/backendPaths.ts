@@ -184,7 +184,7 @@ export default class BackendPath {
         }
 
         // update
-        public static async UpdateNoteById(token: string, noteId: string, updatedNote: note, thoughtsToUpdate: thought[], thoughtsToRemove: thought[]): Promise<note> {
+        public static async UpdateNoteById(token: string, noteId: string, updatedNote: note, thoughtsToUpdate: thought[]): Promise<note> {
             const path = `${this.PATH}/${noteId}`;
 
             const res = await fetch(path, {
@@ -193,7 +193,7 @@ export default class BackendPath {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ title: updatedNote.title, thoughtsToUpdate, thoughtsToRemove}),
+                body: JSON.stringify({ title: updatedNote.title, thoughtsToUpdate}),
             });
 
             if (!res.ok) {
@@ -230,6 +230,28 @@ export default class BackendPath {
 
     public static Thoughts = class {
         static readonly PATH: string = `${BackendPath.BASE_URL}/thoughts`;
+
+        public static async UpdateMultiple(token: string, thoughts:thought[]): Promise<thought[]> {
+            const path = `${this.PATH}/update/multiple`;
+
+            const res = await fetch(path, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(thoughts),
+            });
+
+            if (!res.ok) {
+                const data = await res.text();
+                return Promise.reject({
+                    name: `${res.status}`,
+                    message: data ? safeJsonParse(data) ?? data : null,
+                } as Error);
+            }
+            return await res.json();
+        }
 
         public static async GetThoughtsForNote(token: string, noteId: string) : Promise<thought[]> {
             const path = `${this.PATH}/note/${noteId}`;

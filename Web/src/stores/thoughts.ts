@@ -14,6 +14,12 @@ export const useThoughtStore = defineStore('thoughts', () => {
         return createdThought;
     }
 
+    async function updateMultiple(thoughts: thought[]) : Promise<thought[]> {
+        let updatedThoughts = await BackendPaths.Thoughts.UpdateMultiple(authStore.jwtToken, thoughts);
+    
+        return updatedThoughts;
+    }
+
     async function createThoughtWithNoteTitle(thoughtObj: thought, noteTitle: string): Promise<thought> {
         // if the noteTitle doesn't find any note, it creates a note with the title
         let createdThought = await BackendPaths.Thoughts.CreateThoughtOnNote(authStore.jwtToken, thoughtObj, noteTitle);
@@ -38,7 +44,8 @@ export const useThoughtStore = defineStore('thoughts', () => {
         createThought,
         deleteThought,
         createThoughtWithNoteTitle,
-        getThoughtsForNote
+        getThoughtsForNote,
+        updateMultiple
     }
 });
 

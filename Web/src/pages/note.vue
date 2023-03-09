@@ -52,10 +52,6 @@
 
     let thoughtsToUpdate = ref([] as any[]);
 
-    // TODO if you remove a thought, you need to update this array, so probably event based right
-    // * could be more efficient to remove as you go, not all at once
-    let thoughtsToRemove = ref([] as any[]);
-
     let currentThoughtIndex = ref(0);
     let focusTrigger = ref(0);
     let mouseOverThoughts = ref(false);
@@ -96,22 +92,28 @@
         }
     }
 
-    let addThoughtElement = (evt:any) => {
+    let addThoughtElement = async (evt:any) => {
         // if our mouse is below the current thoughts div, add a new thought, and our last thought isn't empty
         if (!mouseOverThoughts.value && note.value.thoughts[note.value.thoughts.length - 1].content.length === 0) {
             console.log("Adding new thought");
-            note.value.thoughts.push({
+            
+
+            let newThought = await thoughtStore.createThought({
                 _id: "",
                 content: "",
                 noteId: note.value._id
             });
-            // TODO could be a move to directly call create thought
-            thoughtsToUpdate.value.push({
-                _id: Math.random().toString(36).substring(7), // not perfect, but will work to find it in array to update. Then will hopefully be overwritten by the server
-                content: "",
-                noteId: note.value._id
-            });
-            focusThought(note.value.thoughts.length - 1);
+
+            // make sure this went through
+            if (newThought !== null) {
+                noteThoughts.value.push(newThought);
+
+                note.value.thoughts.push(newThought);
+                
+                focusThought(note.value.thoughts.length - 1);
+            } else {
+                console.error("Failed to create thought");
+            }
         }
     }
 
@@ -141,8 +143,10 @@
 
                 // call notestore and update note
                 console.log("Trying to save note: ", note.value);
-                await noteStore.updateNote(note.value, thoughtsToUpdate.value, thoughtsToRemove.value);
-                thoughtsToRemove.value = [];
+
+                // await thoughtStore.updated(thoughtsToUpdate.value);
+
+                await noteStore.updateNote(note.value, thoughtsToUpdate.value);
                 thoughtsToUpdate.value = [];
             }
         });

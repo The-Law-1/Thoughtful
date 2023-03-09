@@ -1,10 +1,11 @@
 import {
     Body,
-    Controller, Delete, Get, HttpCode, Param, Post, UseGuards,
+    Controller, Delete, Get, HttpCode, Param, Patch, Post, UseGuards,
 } from "@nestjs/common";
 import { ThoughtsService } from "./thoughts.service";
 import { Thought, ThoughtSchema } from "./schemas/thought.schema";
 import { CreateThoughtDto } from "./dto/create-thought.dto";
+import { UpdateThoughtDto } from "./dto/update-thought.dto";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { ApiBearerAuth } from "@nestjs/swagger";
 import mongoose from "mongoose";
@@ -86,6 +87,19 @@ export class ThoughtsController {
     @HttpCode(200)
     async deleteOne(@Param("id") idParam: string): Promise<Thought> {
         return this.thoughtsService.DeleteOne(idParam);
+    }
+
+    /**
+     * Update multiple thoughts.
+     * @param thoughts thoughts to update.
+     * @returns Updated thoughts
+     */
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @Patch("update/multiple")
+    @HttpCode(200)
+    async updateMultiple(@Body() thoughts: UpdateThoughtDto[]): Promise<Thought[]> {
+        return this.thoughtsService.UpdateMultiple(thoughts);
     }
 
     /**

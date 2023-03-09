@@ -41,29 +41,16 @@ export class NoteService {
         return await this.noteModel.findByIdAndRemove(id).exec();
     }
 
-    // update one
-    async UpdateOne(id: mongoose.Types.ObjectId, title: string, newThoughts: ObjectId[], deletedThoughts: string[]): Promise<Note> {
+    // // update one
+    // async UpdateOne(id: mongoose.Types.ObjectId, title: string): Promise<Note> {
 
-        // * thoughtsToUpdate also contains new thoughts
-        // update/create thoughts
-        // put the ids of the new thoughts into the note
-        let noteToUpdate = await this.noteModel.findById(id).exec();
+    //     let noteToUpdate = await this.noteModel.findById(id).exec();
 
-        // even if it's the same, no harm done
-        noteToUpdate.title = title;
+    //     // even if it's the same, no harm done
+    //     noteToUpdate.title = title;
 
-        // add new thoughts to note thoughts
-        noteToUpdate.thoughts.push.apply(newThoughts);
-
-        // ! this is also pretty rough but lets hope you're not deleting 100 thoughts at once
-        // remove deleted thoughts from note thoughts
-        noteToUpdate.thoughts = noteToUpdate.thoughts.filter(thought => !deletedThoughts.includes(thought.toString()));
-
-        return await noteToUpdate.save();
-        // * option new: true returns the updated document
-        // let updatedNote = this.noteModel.findByIdAndUpdate(id, createNoteDto, {new: true}).exec();
-        // return await this.noteModel.findById(id).exec();
-    }
+    //     return await noteToUpdate.save();
+    // }
 
     async FindOneByThoughtId(thoughtId: string): Promise<NoteDocument> {
         // does this work?

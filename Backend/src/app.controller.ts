@@ -41,7 +41,6 @@ export class AppController {
         return HttpStatus.OK;
     }
 
-    // TODO update note here and call both services separately
     /**
      * Update a note
      * @param idParam id of the note to update
@@ -56,22 +55,14 @@ export class AppController {
         // url decode id?
         // decodeURIComponent(idParam);
 
-        let createdThoughts = [];
-
-        // create/update thoughts
-        updateNoteDto.thoughtsToUpdate.forEach(async (thought: Thought , i) => {
-            let isNew = thought._id == null;
-
-            let updatedThought = await this.thoughtService.UpdateOne(thought._id ? thought._id.toString() : null, thought);
-
-            if (isNew) {
-                createdThoughts.push(updatedThought._id);
-            }
-        });
+        let updatedThoughts = await this.thoughtService.UpdateMultiple(updateNoteDto.thoughtsToUpdate);
 
         // remove thoughts
+        if (updatedThoughts.length !== updateNoteDto.thoughtsToUpdate.length) {
+            throw new BadRequestException("Thoughts to update did not match updated thoughts");
+        }
 
-        return this.noteService.UpdateOne(new Types.ObjectId(idParam), updateNoteDto.title, createdThoughts, updateNoteDto.thoughtsToRemove.map(thought => thought._id.toString()));
+        return this.noteService.RenameNote(new Types.ObjectId(idParam), updateNoteDto.title);
     }
 
     @UseGuards(JwtAuthGuard)
