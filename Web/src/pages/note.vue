@@ -19,13 +19,12 @@
                     @click="() => clickThought(i)"
                     @focusThought="(idx) => focusThought(idx)"
                     @thoughtUpdated="(val) => handleThoughtUpdated(thought._id, val)"
-                    @thoughtDeleted="(id) => deleteThought(id)"
+                    @thoughtDeleted="(id) => deleteThought(thought._id)"
                     @thoughtInserted="(idx) => insertThought(idx)"
                     :ref="'thought-' + i"
                     :key="`thoughtkey-${thought._id}-${i}`"
                     :focus-trigger="i === currentThoughtIndex ? 1 + focusTrigger : 0"
                     :note-name="note.title"
-                    :thought-id="thought._id"
                     :thought-index="i"
                     v-model="thought.content"/>
             </div>
@@ -81,7 +80,7 @@
                 console.log("focus: Focusing thought at index: ", idx);
                 currentThoughtIndex.value = idx;
                 focusTrigger.value++;
-            })
+            });
         }
     }
 
@@ -94,7 +93,10 @@
     }
 
     let deleteThought = async (id:string) => {
-        await thoughtStore.deleteThought(id);
+        thoughtStore.deleteThought(id)
+            .then(res => {
+                console.log("Thought deleted: ", res);
+            });
 
         let idx = noteThoughts.value.findIndex(t => t._id === id);
 
@@ -107,21 +109,36 @@
     }
 
     let insertThought = async (idx:number) => {
-        let newThought = await thoughtStore.createThought({
+
+        // this is making our note adding slow as hell, do it asynchronously
+        thoughtStore.createThought({
+            _id: "",
+            content: "",
+            noteId: note.value._id
+        }).then(res => {
+            noteThoughts.value[idx]._id = res._id;
+            note.value.thoughts = noteThoughts.value;
+            focusThought(idx);
+        })
+        .catch(err => {
+            alert("Failed to create thought");
+            console.error(err);
+        });
+        // let newThought = {
+        //     _id: "",
+        //     content: "",
+        //     noteId: note.value._id
+        // }
+
+        // make sure this went through
+        noteThoughts.value.splice(idx, 0, {
             _id: "",
             content: "",
             noteId: note.value._id
         });
+        note.value.thoughts = noteThoughts.value;
 
-        // make sure this went through
-        if (newThought !== null) {
-            noteThoughts.value.splice(idx, 0, newThought);
-            note.value.thoughts = noteThoughts.value;
-
-            focusThought(idx);
-        } else {
-            console.error("Failed to create thought");
-        }
+        focusThought(idx);
     }
 
     let addThoughtElement = async (evt:any) => {
