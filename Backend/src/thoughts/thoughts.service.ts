@@ -94,6 +94,13 @@ export class ThoughtsService {
         return await Promise.all(thoughts.map(thought => this.UpdateOne(thought._id.toString(), { _id: new Types.ObjectId(thought._id), content: thought.content, noteId: thought.noteId })));
     }
 
+    async DeleteAllWithNoteId(noteId: string): Promise<any> {
+        const deleteResult = await this.thoughtModel.deleteMany({noteId: noteId}).exec();
+
+        // IDK how to check if the delete was successful
+        return deleteResult;
+    }
+
     // update
     async UpdateOne(id: string, thought: Thought): Promise<Thought> {
         let thoughtToUpdate = await this.thoughtModel.findById(id).exec();

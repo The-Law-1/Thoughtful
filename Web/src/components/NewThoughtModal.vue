@@ -111,7 +111,7 @@
         // id is useless, we only send content and noteId to the server haha
         // but we need it because of type thought
         let thoughtObject = { 
-            id: "",
+            _id: "",
             content: props.thought,
             noteId: ""};
 

@@ -60,18 +60,18 @@ export class NoteController {
         return this.noteService.GetOne(idParam);
     }
 
-    /**
-     * Delete a note
-     * @param idParam Note ID
-     * @returns Deleted note
-     */
-    @UseGuards(JwtAuthGuard)
-    @ApiBearerAuth()
-    @Delete(":id")
-    @HttpCode(200)
-    async deleteOne(@Param("id") idParam: string): Promise<Note> {
-        return this.noteService.DeleteOne(idParam);
-    }
+// /**
+//  * Delete a note
+//  * @param idParam Note ID
+//  * @returns Deleted note
+//  */
+// @UseGuards(JwtAuthGuard)
+// @ApiBearerAuth()
+// @Delete(":id")
+// @HttpCode(200)
+// async deleteOne(@Param("id") idParam: string): Promise<Note> {
+//     return this.noteService.DeleteOne(idParam);
+// }
 
     // /**
     //  * Update a note

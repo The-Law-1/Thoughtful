@@ -1,5 +1,8 @@
 <template>
     <div>
+        <div v-if="searchStore.statusMessage.length > 0" class=" text-center">
+            {{ searchStore.statusMessage }}
+        </div>
         <!-- flexgrid with all the tools -->
         <div class="flex justify-center">
             <!-- Tools grid -->
@@ -26,7 +29,7 @@
     import { useNoteStore } from "@/stores/notes";
     import { useSearchStore } from "@/stores/search";
     import { LightningBoltIcon } from '@heroicons/vue/solid';
-    import { resolveComponent, ref, markRaw, shallowRef } from "vue";
+    import { resolveComponent, ref, markRaw, shallowRef, onMounted, watch } from "vue";
 
     const ThoughtSearchBar = shallowRef(ThoughtSearchBarVue);
     const NoteSearchBar = shallowRef(NoteSearchBarVue);
@@ -36,7 +39,7 @@
 
     // let noteStore = ref(useNoteStore() as any);
     let noteStore = useNoteStore() as any;
-    let searchStore = useSearchStore() as any;
+    let searchStore = ref(useSearchStore());
 
     let currentToolIdx = ref(0);
     let tools = ref([] as any[]);
@@ -59,5 +62,13 @@
         currentToolIdx.value = idx;
         // console.log("Current tool selected: ", tools.value[idx].label);
     }
+
+    watch(() => searchStore.value.statusMessage, (val) => {
+        console.log("Status message changed: ", val);
+    });
+
+    onMounted(() => {
+        searchStore.value.statusMessage = "";
+    })
 
 </script>

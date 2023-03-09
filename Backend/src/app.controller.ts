@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, HttpCode, HttpException, HttpStatus, Param, Patch, Post, Request, UnauthorizedException, UseGuards } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Patch, Post, Request, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { ApiBearerAuth } from "@nestjs/swagger";
 import { Types } from "mongoose";
@@ -63,6 +63,23 @@ export class AppController {
         }
 
         return this.noteService.RenameNote(new Types.ObjectId(idParam), updateNoteDto.title);
+    }
+
+    /**
+     * Delete a note
+     * @param idParam Note ID
+     * @returns Deleted note
+     */
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @Delete("notes/:id")
+    @HttpCode(200)
+    async deleteOne(@Param("id") idParam: string): Promise<Note> {
+
+        // delete all thoughts with noteId
+        let deletedThoughts = await this.thoughtService.DeleteAllWithNoteId(idParam);
+
+        return this.noteService.DeleteOne(idParam);
     }
 
     @UseGuards(JwtAuthGuard)

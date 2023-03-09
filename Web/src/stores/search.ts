@@ -2,17 +2,18 @@ import NewThoughtModal from '@/components/NewThoughtModal.vue';
 import { note } from '@/types/note';
 import { thought } from '@/types/thought';
 import { defineStore, acceptHMRUpdate } from 'pinia';
-import { DefineComponent } from 'vue';
+import { DefineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from './auth';
 import BackendPaths from './backendPaths';
 import { useNoteStore } from './notes';
 
-
 export const useSearchStore = defineStore('search', () => {
     const authStore = useAuthStore();
     const noteStore = useNoteStore();
     const router = useRouter();
+
+    var statusMessage = ref("");
 
     async function filterNotes(filter:string): Promise<note[]> {
         let filteredResults = await BackendPaths.Notes.GetNotesByTitle(authStore.jwtToken, filter);
@@ -26,11 +27,17 @@ export const useSearchStore = defineStore('search', () => {
         if (typeof noteObj === "string") {
             console.log("Calling the backend to create note: ", noteObj);
             
-            return await noteStore.createNote({ title: noteObj, thoughts: [], id: "" } as note);
+            let res = await noteStore.createNote({ title: noteObj, thoughts: [], _id: "" } as note);
+
+            // I'm pretty sure I should try/catch this
+            statusMessage.value = "Successfully created note " + res.title;
+            console.log("Created note ", statusMessage);
+            return res;
         } else {
             console.log("Selected note: ");
             console.log(noteObj);
             // console.log("Navigating to note: ", noteObj.title);
+            router.push({ path: `/note/${noteObj._id}` });
             // router.push({ path: "/note", query: { noteName:(newValue as string) } });
         }
     }
@@ -57,7 +64,8 @@ export const useSearchStore = defineStore('search', () => {
         // fetchThought,
         noteSelected,
         thoughtSelected,
-        filterThoughts
+        filterThoughts,
+        statusMessage,
     }
 })
 
