@@ -1,6 +1,6 @@
 import { BadRequestException, Body, Controller, Delete, Get, Header, HttpCode, HttpException, HttpStatus, Param, Patch, Post, Request, StreamableFile, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
-import { ApiBearerAuth, ApiOkResponse } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiNoContentResponse, ApiOkResponse } from "@nestjs/swagger";
 import { createReadStream, readdirSync, rmSync } from "fs";
 import { Types } from "mongoose";
 import { join } from "path";
@@ -141,10 +141,10 @@ export class AppController {
     /**
      * route to cleanup exports folder
      */
-    @Get("notes/export/cleanup")
+    @Delete("notes/export/cleanup")
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
-    @HttpCode(200)
+    @HttpCode(204)
     async cleanupExports() {
         const dir = "exports";
 
@@ -153,7 +153,7 @@ export class AppController {
                 rmSync(`${dir}/${f}`);
         });
 
-        return ApiOkResponse();
+        return ApiNoContentResponse();
     }
 
     @UseGuards(JwtAuthGuard)

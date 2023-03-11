@@ -2,7 +2,7 @@
     <article :class="navBarStore.sidebarOpen ? 'pl-[20rem]' : 'pl-0'"
         class="flex justify-center flex-shrink-0 h-[90vh]">
         <div
-            v-if="note"
+            v-if="!loadingNote"
             style="min-width: calc(200px + 20rem)"
             class="bg-paper text-black rounded-lg text-left w-[900px] cursor-text overflow-y-auto"
             @click="(evt) => addThoughtElement(evt)">
@@ -29,10 +29,14 @@
                     v-model="thought.content"/>
             </div>
         </div>
+        <div v-else>
+            <ArrowPathIcon class="animate-spin h-5 w-5"></ArrowPathIcon>
+        </div>
     </article>
 </template>
 
 <script setup lang="ts">
+    import { ArrowPathIcon } from "@heroicons/vue/24/solid";
     import { useNavbarStore } from "@/stores/navbar";
     import { useNoteStore } from "@/stores/notes";
     import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
@@ -157,7 +161,7 @@
 
     let addThoughtElement = async (evt:any) => {
         // if our mouse is below the current thoughts div, add a new thought, and our last thought isn't empty
-        if (!mouseOverThoughts.value && noteThoughts.value[noteThoughts.value.length - 1].content.length !== 0) {
+        if (!mouseOverThoughts.value && (noteThoughts.value.length === 0 || noteThoughts.value[noteThoughts.value.length - 1].content.length !== 0)) {
             console.log("Adding new thought");
 
             let newThought = await thoughtStore.createThought({
@@ -187,7 +191,12 @@
         // note.value = noteStore.getNoteById(noteId);
     });
 
+    let loadingNote = ref(false);
+
     onMounted(async () => {
+
+        loadingNote.value = true;
+
         let noteId = route.params.noteId as string;
         console.log("noteId: ", noteId);
         note.value = await noteStore.getNoteById(noteId);
@@ -195,6 +204,8 @@
         console.log(note.value.thoughts);
 
         noteThoughts.value = await thoughtStore.getThoughtsForNote(noteId);
+
+        loadingNote.value = false;
 
         // listen for keys
         document.addEventListener('keydown', async (e) => {
@@ -220,9 +231,7 @@
     });
 
     onUnmounted(() => {
-        document.removeEventListener('keydown', (evt) => {
-
-        });
+        document.removeEventListener('keydown', (evt) => {});
     });
 
 

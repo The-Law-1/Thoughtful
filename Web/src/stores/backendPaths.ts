@@ -255,6 +255,25 @@ export default class BackendPath {
 
             return data;
         }
+
+        public static async CleanupExports(token: string): Promise<any> {
+            const path = `${this.PATH}/export/cleanup`;
+
+            const res = await fetch(path, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            if (!res.ok) {
+                const data = await res.text();
+                return Promise.reject({
+                    name: `${res.status}`,
+                    message: data ? safeJsonParse(data) ?? data : null,
+                } as Error);
+            }
+            return await res.text();
+        }
     }
 
     public static Thoughts = class {

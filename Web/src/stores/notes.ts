@@ -10,7 +10,7 @@ export const useNoteStore = defineStore('notes', () => {
     const authStore = useAuthStore();
     // const router = useRouter();
 
-    // create note 
+    // create note
     async function createNote(noteObj: note) : Promise<note> {
 
         let createdNote = await BackendPaths.Notes.CreateNote(authStore.jwtToken, noteObj);
@@ -43,6 +43,7 @@ export const useNoteStore = defineStore('notes', () => {
 
         if (data) {
             // call the cleanup route
+            let cleanupRes = await BackendPaths.Notes.CleanupExports(authStore.jwtToken);
         }
 
         return data;
