@@ -61,6 +61,11 @@
     let focusTrigger = ref(0);
     let mouseOverThoughts = ref(false);
 
+    let exportNote = async () => {
+        console.log("Exporting note");
+        await noteStore.exportNote(note.value._id);
+    }
+
     let handleThoughtUpdated = (id:string, val:string) => {
         console.log("Thought updated: ", val);
 

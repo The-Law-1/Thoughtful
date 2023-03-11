@@ -226,6 +226,35 @@ export default class BackendPath {
             }
             return await res.json();
         }
+
+        public static async ExportNoteHtml(token: string, noteId: string, noteName: string = "note"): Promise<any> {
+            const path = `${this.PATH}/export/html/${noteId}`;
+
+            const res = await fetch(path, {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            if (!res.ok) {
+                const data = await res.text();
+                return Promise.reject({
+                    name: `${res.status}`,
+                    message: data ? safeJsonParse(data) ?? data : null,
+                } as Error);
+            }
+            let data = await res.text();
+            console.log(data);
+
+            var FILE = window.URL.createObjectURL(new Blob([data]));
+            var docUrl = document.createElement('a');
+            docUrl.href = FILE;
+            docUrl.setAttribute('download', noteName + ".html");
+            document.body.appendChild(docUrl);
+            docUrl.click();
+
+            return data;
+        }
     }
 
     public static Thoughts = class {

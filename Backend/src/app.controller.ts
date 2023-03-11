@@ -94,11 +94,12 @@ export class AppController {
     @ApiBearerAuth()
     @Get("notes/export/html/:id")
     @Header('Content-Type', 'application/json')
-    // @Header('Content-Disposition', 'attachment; filename="package.json"')
+    @Header('Content-Disposition', 'attachment; filename="export"')
     async exportNoteHtml(@Param("id") idParam: string): Promise<StreamableFile> {
         let note = await this.noteService.GetOne(idParam);
         let thoughts = await this.thoughtService.FindThoughtsForNoteId(new Types.ObjectId(idParam));
 
+        // TODO should put this in a note service
         let html = `
 <html>
     <head>

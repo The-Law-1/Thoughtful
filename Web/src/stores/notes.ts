@@ -38,11 +38,22 @@ export const useNoteStore = defineStore('notes', () => {
         return deletedNote;
     }
 
+    async function exportNote(noteId: string, noteName: string = "note"): Promise<any> {
+        let data = await BackendPaths.Notes.ExportNoteHtml(authStore.jwtToken, noteId, noteName);
+
+        if (data) {
+            // call the cleanup route
+        }
+
+        return data;
+    }
+
     return {
         deleteNote,
         createNote,
         getNoteById,
-        updateNote
+        updateNote,
+        exportNote
     }
 })
 
