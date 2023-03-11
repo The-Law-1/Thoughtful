@@ -6,7 +6,17 @@ import { computed } from "vue";
 export const useAuthStore = defineStore("auth", () => {
     const jwtToken = useStorage<string | null>("jwtTokenThoughtful", null);
     const testValue = useStorage<string | null>("testValue", null);
-  
+
+    const jwtPayload = computed(() => {
+        if (jwtToken.value === null) return null;
+    
+        const splitted = jwtToken.value.split(".");
+        if (splitted.length < 2) return null;
+    
+        return JSON.parse(window.atob(splitted[1])) /*as JwtPayload*/;
+    });
+    
+    
     const login: (
       password: string,
     ) => Promise<boolean> = async (password) => {
@@ -35,21 +45,15 @@ export const useAuthStore = defineStore("auth", () => {
     }
 
     const verifyLoggedIn: () => Promise<boolean> = async () => {
-        // you want to call the api to verify the token is not expired and it's not some random token
-        if (jwtToken.value) {
-            try {
-                let isValid = await Backend.Auth.VerifyToken(jwtToken.value);
 
-                if (!isValid)
-                    jwtToken.value = null;
+        // console.log(jwtPayload.value);
 
-                return isValid;
-            } catch (error) {
-                jwtToken.value = null;
-                return false;
-            }
+        // * this should work, I guess we'll find out tomorrow
+        if (jwtPayload.value && jwtPayload.value.exp < Date.now() / 1000) {
+            jwtToken.value = null;
+            return false;
         }
-        return false;
+        return true;
     }
 
     // const testStorage: (
@@ -63,6 +67,7 @@ export const useAuthStore = defineStore("auth", () => {
         login,
         testApi,
         verifyLoggedIn,
+        jwtPayload,
         // testStorage
     }
 });

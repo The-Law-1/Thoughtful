@@ -19,8 +19,11 @@ export class AuthService {
     async createJWT() {
         // * this feels weird
         const payload = { username: process.env.USERNAME, sub: process.env.USER_ID };
+
+        // get a timestamp for now + 10h
+
         return {
-            access_token: this.jwtService.sign(payload),
+            access_token: this.jwtService.sign(payload)
         };
     }
 
