@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     Body,
     Controller, Delete, Get, HttpCode, Param, Patch, Post, UseGuards,
 } from "@nestjs/common";
@@ -72,8 +73,15 @@ export class ThoughtsController {
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
     @Get(":id")
+    @HttpCode(200)
+    @HttpCode(400)
     async GetOne(@Param("id") idParam: string): Promise<Thought> {
-        return this.thoughtsService.GetOne(idParam);
+        let thought = await this.thoughtsService.GetOne(idParam);
+
+        if (!thought) {
+            throw new BadRequestException("Thought not found");
+        }
+        return thought;
     }
 
     /**
