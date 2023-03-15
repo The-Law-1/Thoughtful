@@ -1,90 +1,150 @@
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import mongoose, { Model, ObjectId, Types } from "mongoose";
+import { MyFireStoreService } from "src/firebase/firebase.service";
 import { Thought } from "src/types/thought";
 import { CreateNoteDto } from "./dto/create-note.dto";
 import { UpdateNoteDto } from "./dto/update-note.dto";
-import { Note, NoteDocument } from "./schemas/note.schema";
+import { Note } from "../types/note"; 
+import { FieldValue } from "firebase-admin/firestore";
 
 @Injectable()
 export class NoteService {
-    constructor(
-        @InjectModel(Note.name)
-        private noteModel: Model<NoteDocument>) {}
+    notesDocRef = null;
+
+    constructor(private firebaseService: MyFireStoreService) {
+        this.notesDocRef = firebaseService.db.collection('notes');
+    }
 
     async create(createNoteDto: CreateNoteDto): Promise<Note> {
-        const createdNote = new this.noteModel(createNoteDto);
+        const res = await this.notesDocRef.add(
+            createNoteDto
+        );
 
-        let note = await createdNote.save();
-        // does the id port automatically?
-        // note._id = createdNote._id;
-
-        return note;
+        return new Note(res.id, createNoteDto.title, createNoteDto.thoughts);
     }
 
     async FindAll(): Promise<Note[]> {
-        return this.noteModel.find().exec();
+        const snapshot = await this.notesDocRef.get();
+        const notes = [] as Note[];
+
+        snapshot.forEach(doc => {
+            const note = doc.data() as Note;
+            note.id = doc.id;
+            notes.push(note);
+        });
+
+        return notes;
     }
 
-    // find note by title
+    // ! this is bad I know, cf thoughts service
     async FindAllByTitle(title: string): Promise<Note[]> {
-        return this.noteModel.find({title: {$regex: title, $options: "i"}}).exec();
+        const notesDoc = await this.notesDocRef.get();
+
+        if (notesDoc.empty) {
+            return [];
+        }
+
+        const filteredNotes = notesDoc.docs.filter(doc => doc.data().title.includes(title));
+
+        return filteredNotes.map(doc => new Note(doc.id, doc.data().title, doc.data().thoughts));        
     }
 
     // get
     async GetOne(id: string): Promise<Note> {
-        return this.noteModel.findById(id).exec();
+        const doc = await this.notesDocRef.doc(id).get();
+
+        return new Note(doc.id, doc.data().title, doc.data().thoughts);
     }
 
     // delete one
     async DeleteOne(id: string): Promise<Note> {
-        return await this.noteModel.findByIdAndRemove(id).exec();
+        const doc = await this.notesDocRef.doc(id).get();
+        const note = new Note(doc.id, doc.data().title, doc.data().thoughts);
+
+        let res = await this.notesDocRef.doc(id).delete();
+
+        if (res === null)
+            return null;
+
+        return note;
     }
 
-    // // update one
-    // async UpdateOne(id: mongoose.Types.ObjectId, title: string): Promise<Note> {
+    // // // update one
+    // // async UpdateOne(id: mongoose.Types.ObjectId, title: string): Promise<Note> {
 
-    //     let noteToUpdate = await this.noteModel.findById(id).exec();
+    // //     let noteToUpdate = await this.noteModel.findById(id).exec();
 
-    //     // even if it's the same, no harm done
-    //     noteToUpdate.title = title;
+    // //     // even if it's the same, no harm done
+    // //     noteToUpdate.title = title;
 
-    //     return await noteToUpdate.save();
-    // }
+    // //     return await noteToUpdate.save();
+    // // }
 
     async RemoveThought(noteId:string, thoughtId: string): Promise<Note> {
-        let noteDocument = await this.noteModel.findById(noteId).exec();
 
-        if (!noteDocument)
-            throw null;
+        const noteRef = this.notesDocRef.doc(noteId);
 
-        noteDocument.thoughts = noteDocument.thoughts.filter(x => x.toString() !== thoughtId);
+        if (!noteRef.exists)
+            return null;
 
-        return await noteDocument.save();
+        const removeRes = await noteRef.update({
+            thoughts: FieldValue.arrayRemove(thoughtId)
+        });
+
+        if (removeRes === null)
+            return null;
+
+        // get updated note
+        const note = await noteRef.get();
+
+        return new Note(note.id, note.title, note.thoughts);
     }
 
-    async FindOneByThoughtId(thoughtId: string): Promise<NoteDocument> {
-        // does this work? ! it doesn't
-        return this.noteModel.findOne({"thoughts._id": new mongoose.Types.ObjectId(thoughtId)}).exec();
+    async FindOneByThoughtId(thoughtId: string): Promise<Note> {
+        const notesDoc = await this.notesDocRef.where("thoughts", "array-contains", thoughtId).get();
+
+        if (notesDoc.empty) {
+            return null;
+        }
+        return new Note(notesDoc.docs[0].id, notesDoc.docs[0].data().title, notesDoc.docs[0].data().thoughts);
     }
 
-    async RenameNote(id: mongoose.Types.ObjectId, newName: string): Promise<Note> {
-        let noteToUpdate = await this.noteModel.findById(id).exec();
+    async RenameNote(id: string, newName: string): Promise<Note> {
 
-        noteToUpdate.title = newName;
+        const noteRef = this.notesDocRef.doc(id);
 
-        let updatedNote = await noteToUpdate.save();
+        if (!noteRef.exists)
+            return null;
 
-        return updatedNote;
+        const renameRes = await noteRef.update({
+            title: newName
+        });
+
+        if (renameRes === null)
+            return null;
+
+        // get updated note
+        const note = await noteRef.get();
+
+        return new Note(note.id, note.title, note.thoughts);
     }
 
-    async AddThought(id: mongoose.Types.ObjectId, thoughtId: string): Promise<Note> {
-        let noteToUpdate = await this.noteModel.findById(id).exec();
+    async AddThought(id: string, thoughtId: string): Promise<Note> {
+        // get the note by id
+        const noteRef = this.notesDocRef.doc(id);
 
-        noteToUpdate.thoughts.push(new mongoose.Types.ObjectId(thoughtId));
+        if (!noteRef.exists)
+            return null;
 
-        let updatedNote = await noteToUpdate.save();
+        // Atomically add a new region to the "regions" array field.
+        const unionRes = await noteRef.update({
+            thoughts: FieldValue.arrayUnion(thoughtId)
+        });
 
-        return updatedNote;
+        // get updated note
+        const note = await noteRef.get();
+
+        return new Note(note.id, note.title, note.thoughts);
     }
 }

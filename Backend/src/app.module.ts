@@ -9,8 +9,8 @@ import { AuthModule } from './auth/auth.module';
 
 @Module({
 	imports: [ConfigModule.forRoot({isGlobal: true}), // * isGlobal: true doesn't work *clown emoji* import it in all your modules
-              MongooseModule.forRoot(`mongodb://${process.env.MONGO_ROOT_USERNAME}:${process.env.MONGO_ROOT_PASSWORD}@${process.env.MONGO_HOST}:${process.env.MONGO_PORT}`,
-                                     {dbName: "Thoughtful"}),
+            //   MongooseModule.forRoot(`mongodb://${process.env.MONGO_ROOT_USERNAME}:${process.env.MONGO_ROOT_PASSWORD}@${process.env.MONGO_HOST}:${process.env.MONGO_PORT}`,
+            //                          {dbName: "Thoughtful"}),
               ThoughtsModule,
               NoteModule,
               AuthModule],

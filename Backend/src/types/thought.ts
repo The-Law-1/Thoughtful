@@ -1,7 +1,13 @@
-import mongoose from "mongoose";
+import { CreateThoughtDto } from "src/thoughts/dto/create-thought.dto";
 
 export class Thought {
-    _id: mongoose.Types.ObjectId;
+    id: string;
     content: string;
-    noteId: mongoose.Types.ObjectId;
+    noteId: string;
+
+    constructor(id: string, content: string, noteId: string) {
+        this.id = id;
+        this.content = content;
+        this.noteId = noteId;
+    }
 }

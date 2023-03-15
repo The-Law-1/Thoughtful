@@ -1,13 +1,16 @@
 import mongoose, { Model, Types } from "mongoose";
 import { BadRequestException, forwardRef, Inject, Injectable } from "@nestjs/common";
 import { InjectModel, Schema } from "@nestjs/mongoose";
-import { Thought, ThoughtDocument } from "./schemas/thought.schema";
+// import { Thought, ThoughtDocument } from "./schemas/thought.schema";
+import { Thought} from "../types/thought";
 import { CreateThoughtDto } from "./dto/create-thought.dto";
 import { NoteService } from "src/notes/note.service";
 import { Note, NoteDocument } from "src/notes/schemas/note.schema";
 import { UpdateThoughtDto } from "./dto/update-thought.dto";
 import { createCipheriv, createDecipheriv, randomBytes, scrypt } from 'crypto';
 import { promisify } from 'util';
+import { getFirestore } from "firebase-admin/firestore";
+import { MyFireStoreService } from "src/firebase/firebase.service";
 
 @Injectable()
 export class ThoughtsService {
@@ -16,11 +19,16 @@ export class ThoughtsService {
     encryptionPassword = 'Password used to generate key';
     key = null as Buffer;
 
+    thoughtsDocRef = null;
+    notesDocRef = null;
+
     constructor(
-        @InjectModel(Thought.name)
-        private thoughtModel: Model<ThoughtDocument>, private noteService: NoteService) {
+        private noteService: NoteService, private firebaseService: MyFireStoreService) {
 
             this.encryptionPassword = process.env.ENCRYPTION_PASSWORD;
+
+            this.thoughtsDocRef = firebaseService.db.collection('thoughts');
+            this.notesDocRef = firebaseService.db.collection('notes');
 
             this.initEncryption();
         }
@@ -59,74 +67,80 @@ export class ThoughtsService {
         // * encrypt the content in createThoughtDto
         createThoughtDto.content = this.encrypt(createThoughtDto.content);
 
-        const createdThought = new this.thoughtModel(createThoughtDto);
+        const noteDoc = await this.notesDocRef.doc(createThoughtDto.noteId).get();
 
-        // if the noteId is not a valid ObjectId, create a new note
-        if (!Types.ObjectId.isValid(createThoughtDto.noteId)) {
-            // create a new note
+        if (!noteDoc.exists) {
+            // create note
             const newNote = await this.noteService.create({title: "Untitled", thoughts: [] });
-            // add the noteId to the thought
-            createdThought.noteId = newNote._id;
-
-            await this.noteService.AddThought(newNote._id, createdThought._id.toString());
-
-        } else {
-            // find the note by the noteId
-            const note = await this.noteService.GetOne(createThoughtDto.noteId);
-            // add the thought to the note
-            // note.thoughts.push(createdThought._id);
-
-            createdThought.noteId = note._id;
-
-            await this.noteService.AddThought(note._id, createdThought._id.toString());
-            // save the note
-            // await this.noteService.UpdateOne(note._id, {title: note.title, thoughts: note.thoughts.map(x =>  x.toString())});
+            
+            createThoughtDto.noteId = newNote.id;
         }
 
-        createdThought.save();
+        // * create the thought
+        const res = await this.thoughtsDocRef.add(
+            createThoughtDto
+        );
+
+        // add thought to note
+        await this.noteService.AddThought(createThoughtDto.noteId, res.id);
+
+        const createdThought = new Thought(res.id, createThoughtDto.content, createThoughtDto.noteId);
 
         return createdThought;
     }
 
     async addThoughtToNote(noteTitle: string, createThoughtDto: CreateThoughtDto): Promise<Thought> {
-        const createdThought = new this.thoughtModel(createThoughtDto);
 
-        // check if note exists
-        const notes = await this.noteService.FindAllByTitle(noteTitle);
-        if (notes.length > 0) {
-            let noteToChange = notes[0];
-            // add the thought to the note
+        // find note by title
+        const noteDoc = await this.notesDocRef.where("title", "==", noteTitle).get();
 
-            this.noteService.AddThought(noteToChange._id, createdThought._id.toString());
-        } else {
+        let noteId = null;
 
-            // create a new note
+        if (noteDoc.empty) {
+            // create note
             const newNote = await this.noteService.create({title: noteTitle, thoughts: [] });
-            // add the noteId to the thought
-            createdThought.noteId = newNote._id;
-
-            await this.noteService.AddThought(newNote._id, createdThought._id.toString());
+            noteId = newNote.id;
+        } else {
+            noteId = noteDoc.docs[0].id;
         }
-        createdThought.save();
+
+        createThoughtDto.noteId = noteId;
+        // create thought
+        const createdThought = await this.create(createThoughtDto);
+
+        // add thought to note
+        await this.noteService.AddThought(noteId, createdThought.id);
 
         return createdThought;
     }
 
-    async FindThoughtsForNoteId(id: mongoose.Types.ObjectId): Promise<Thought[]> {
+    async FindThoughtsForNoteId(noteId: string): Promise<Thought[]> {
+            
+        const thoughtsDoc = await this.thoughtsDocRef.where("noteId", "==", noteId).get();
 
-        let thoughts = await this.thoughtModel.find({ noteId: id}).exec();
-        // decrypt content
-        for (let i = 0; i < thoughts.length; i++) {
-            const thought = thoughts[i];
-            thought.content = this.decrypt(thought.content);
+        if (thoughtsDoc.empty) {
+            return [];
         }
+
+        let thoughts = [];
+
+        for (const doc of thoughtsDoc.docs) {
+            const thought = new Thought(doc.id, this.decrypt(doc.data().content), doc.data().noteId);
+            thoughts.push(thought);
+        }
+
         return thoughts;
     }
 
 
     // I hardly see a use for this but you never know
     async FindAll(): Promise<Thought[]> {
-        return this.thoughtModel.find().exec();
+        const thoughtsDoc = await this.thoughtsDocRef.get();
+
+        if (thoughtsDoc.empty) {
+            return [];
+        }
+        return thoughtsDoc.docs.map(doc => new Thought(doc.id, this.decrypt(doc.data().content), doc.data().noteId));
     }
 
     // filter by content
@@ -135,29 +149,30 @@ export class ThoughtsService {
         // ?? encrypt the content ?? works, but case-sensitive
         content = this.encrypt(content);
 
-        console.log("content ", content);
-        // this is a regex search
-        // https://docs.mongodb.com/manual/reference/operator/query/regex/
-        let thoughts = await this.thoughtModel.find({content: {$regex: content, $options: "i"}}).exec();
+        // fetch all the thoughts
+        const thoughtsDoc = await this.thoughtsDocRef.get();
 
-        // decrypt the content
-        for (let i = 0; i < thoughts.length; i++) {
-            const thought = thoughts[i];
-            thought.content = this.decrypt(thought.content);
+        if (thoughtsDoc.empty) {
+            return [];
         }
 
-        return thoughts;
+        // ! ok so this is really bad but firebase doesn't support string filter (yet) but we're gonna try to keep our data small
+        // filter by content containing filter
+        const filteredThoughts = thoughtsDoc.docs.filter(doc => doc.data().content.includes(content));
+
+        // ! this is also ugly
+        return filteredThoughts.map(doc => new Thought(doc.id, this.decrypt(doc.data().content), doc.data().noteId));
     }
 
     // get
     async GetOne(id: string): Promise<Thought> {
-        let thought = await this.thoughtModel.findById(id).exec();
+        const thoughtDoc = await this.thoughtsDocRef.doc(id).get();
 
-        if (!thought) {
+        if (thoughtDoc.empty) {
             return null;
         }
 
-        thought.content = this.decrypt(thought.content);
+        let thought = new Thought(thoughtDoc.id, this.decrypt(thoughtDoc.data().content), thoughtDoc.data().noteId);
 
         return thought;
     }
@@ -170,46 +185,58 @@ export class ThoughtsService {
             thought.content = this.encrypt(thought.content);
         }
 
-        return await Promise.all(thoughts.map(thought => this.UpdateOne(thought._id.toString(), { _id: new Types.ObjectId(thought._id), content: thought.content, noteId: thought.noteId })));
+        const batch = this.firebaseService.db.batch();
+        thoughts.forEach(thought => {
+            const thoughtDoc = this.thoughtsDocRef.doc(thought.id);
+            batch.update(thoughtDoc, { content: thought.content, noteId: thought.noteId });
+        });
+
+        let res = await batch.commit();
+
+        // i think typescript is smart enough to convert two overlapping types to the return type
+        return res !== null ? thoughts : null;
     }
 
-    async DeleteAllWithNoteId(noteId: string): Promise<any> {
-        const deleteResult = await this.thoughtModel.deleteMany({noteId: noteId}).exec();
+    async DeleteAllWithNoteId(noteId: string): Promise<boolean> {
+        // * delete all thoughts with noteId
+        const thoughtsDoc = await this.thoughtsDocRef.where("noteId", "==", noteId).get();
 
-        // IDK how to check if the delete was successful
-        return deleteResult;
+        if (thoughtsDoc.empty) {
+            return null;
+        }
+
+        const batch = this.firebaseService.db.batch();
+        thoughtsDoc.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+        let res = await batch.commit();
+
+        return res !== null ? true : false;
     }
 
     // update
-    async UpdateOne(id: string, thought: Thought): Promise<Thought> {
-        let thoughtToUpdate = await this.thoughtModel.findById(id).exec();
+    async UpdateOne(id: string, thought: UpdateThoughtDto): Promise<Thought> {
+        const thoughtRef = await this.thoughtsDocRef.doc(id);
 
-        // * encrypt the content in thought
+        if (thoughtRef.empty)
+            return null;
+        // * encrypt the content in updateThoughtDto
         thought.content = this.encrypt(thought.content);
 
-        if (thoughtToUpdate === null) {
-            return await this.create(thought);
-        }
+        thoughtRef.update({ content: thought.content, noteId: thought.noteId });
 
-        thoughtToUpdate.content = thought.content;
-        thoughtToUpdate.noteId = thought.noteId;
-
-        return await thoughtToUpdate.save();
+        return new Thought(id, thought.content, thought.noteId);
     }
 
     // delete one
-    async DeleteOne(id: string): Promise<Thought> {
+    async DeleteOne(id: string): Promise<boolean> {
+        const res = await this.thoughtsDocRef.doc(id).delete();
 
-        const thought = await this.thoughtModel.findByIdAndRemove({_id: id}).exec();
+        // delete it in the note
+        const deleteFromNoteRes = await this.noteService.RemoveThought(res.data().noteId, id);
 
-        if (thought === null)
-            throw new BadRequestException("Thought not found");
+        return (res !== null && deleteFromNoteRes !== null) ? true : null;
 
-        let updatedNote = await this.noteService.RemoveThought(thought.noteId, id);
-        if (updatedNote === null)
-            throw new BadRequestException("Note not found");
-
-        return thought;
     }
 
 }

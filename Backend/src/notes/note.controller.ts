@@ -6,7 +6,7 @@ import { Thought } from "src/types/thought";
 import { CreateNoteDto } from "./dto/create-note.dto";
 import { UpdateNoteDto } from "./dto/update-note.dto";
 import { NoteService } from "./note.service";
-import { Note } from "./schemas/note.schema";
+import { Note } from "../types/note";
 
 @Controller("notes")
 export class NoteController {
@@ -60,34 +60,18 @@ export class NoteController {
         return this.noteService.GetOne(idParam);
     }
 
-// /**
-//  * Delete a note
-//  * @param idParam Note ID
-//  * @returns Deleted note
-//  */
-// @UseGuards(JwtAuthGuard)
-// @ApiBearerAuth()
-// @Delete(":id")
-// @HttpCode(200)
-// async deleteOne(@Param("id") idParam: string): Promise<Note> {
-//     return this.noteService.DeleteOne(idParam);
-// }
-
-    // /**
-    //  * Update a note
-    //  * @param idParam id of the note to update
-    //  * @param createNoteDto update note object
-    //  * @returns updated note
-    //  */
-    // @UseGuards(JwtAuthGuard)
-    // @ApiBearerAuth()
-    // @Patch(":id")
-    // @HttpCode(200)
-    // async updateOne(@Param("id") idParam: string, @Body() updateNoteDto: UpdateNoteDto): Promise<Note> {
-    //     // url decode id?
-    //     // decodeURIComponent(idParam);
-    //     return this.noteService.UpdateOne(new Types.ObjectId(idParam), updateNoteDto);
-    // }
+    /**
+     * Delete a note
+     * @param idParam Note ID
+     * @returns Deleted note
+     */
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @Delete(":id")
+    @HttpCode(200)
+    async deleteOne(@Param("id") idParam: string): Promise<Note> {
+        return this.noteService.DeleteOne(idParam);
+    }
 
     /**
      * Rename a note
@@ -100,6 +84,6 @@ export class NoteController {
     @Put("rename/:id/:title")
     @HttpCode(204)
     async renameOne(@Param("id") idParam: string, @Param("title") newTitle: string): Promise<Note> {
-        return this.noteService.RenameNote(new Types.ObjectId(idParam), newTitle);
+        return this.noteService.RenameNote(idParam, newTitle);
     }
 }

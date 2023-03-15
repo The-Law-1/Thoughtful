@@ -4,11 +4,12 @@ import { ThoughtsController } from "./thoughts.controller";
 import { ThoughtsService } from "./thoughts.service";
 import { Thought, ThoughtSchema } from "./schemas/thought.schema";
 import { NoteModule } from "src/notes/note.module";
+import { MyFireStoreService } from "src/firebase/firebase.service";
 
 @Module({
-    imports: [MongooseModule.forFeature([{ name: Thought.name, schema: ThoughtSchema }]), NoteModule],
+    imports: [NoteModule],
     controllers: [ThoughtsController],
-    providers: [ThoughtsService],
+    providers: [ThoughtsService, MyFireStoreService],
     exports: [ThoughtsService]
 })
 

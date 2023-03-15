@@ -10,7 +10,7 @@ import { AuthDto } from "./auth/dto/auth.dto";
 import { JwtAuthGuard } from "./auth/jwt-auth.guard";
 import { UpdateNoteDto } from "./notes/dto/update-note.dto";
 import { NoteService } from "./notes/note.service";
-import { Note } from "./notes/schemas/note.schema";
+import { Note } from "./types/note";
 import { ThoughtsService } from "./thoughts/thoughts.service";
 import { Thought } from "./types/thought";
 const fs = require('fs');
@@ -65,7 +65,7 @@ export class AppController {
             throw new BadRequestException("Thoughts to update did not match updated thoughts");
         }
 
-        return this.noteService.RenameNote(new Types.ObjectId(idParam), updateNoteDto.title);
+        return this.noteService.RenameNote(idParam, updateNoteDto.title);
     }
 
     /**
@@ -97,7 +97,7 @@ export class AppController {
     @Header('Content-Disposition', 'attachment; filename="export"')
     async exportNoteHtml(@Param("id") idParam: string): Promise<StreamableFile> {
         let note = await this.noteService.GetOne(idParam);
-        let thoughts = await this.thoughtService.FindThoughtsForNoteId(new Types.ObjectId(idParam));
+        let thoughts = await this.thoughtService.FindThoughtsForNoteId(idParam);
 
         // TODO should put this in a note service
         let html = `
