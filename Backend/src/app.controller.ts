@@ -2,7 +2,6 @@ import { BadRequestException, Body, Controller, Delete, Get, Header, HttpCode, H
 import { AuthGuard } from "@nestjs/passport";
 import { ApiBearerAuth, ApiNoContentResponse, ApiOkResponse } from "@nestjs/swagger";
 import { createReadStream, readdirSync, rmSync } from "fs";
-import { Types } from "mongoose";
 import { join } from "path";
 import { AppService } from "./app.service";
 import { AuthService } from "./auth/auth.service";
@@ -120,7 +119,7 @@ export class AppController {
 
         // write to local file
         await fs.writeFile("./exports/" + note.title + ".html", html, (err) => {
-            console.log("error: " + err);
+            console.log("error writing to file: " + err);
         });
 
         // return the file

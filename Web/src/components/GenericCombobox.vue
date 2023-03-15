@@ -90,12 +90,11 @@
         // TODO emit something again... This is a generic component
         console.log(item);
         // this is probably only db items but just to be safe
-        if (item._id) {
-            // alert("Trying to delete item " + item._id);
-            emit("onDeleted", item._id);
+        if (item.id) {
+            emit("onDeleted", item.id);
 
             // remove it from list, if it fails well tough luck
-            filteredResults.value = filteredResults.value.filter((x) => x._id !== item._id);
+            filteredResults.value = filteredResults.value.filter((x) => x.id !== item.id);
         } else {
             alert("Invalid delete");
         }

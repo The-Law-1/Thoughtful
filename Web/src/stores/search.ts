@@ -27,7 +27,7 @@ export const useSearchStore = defineStore('search', () => {
         if (typeof noteObj === "string") {
             console.log("Calling the backend to create note: ", noteObj);
             
-            let res = await noteStore.createNote({ title: noteObj, thoughts: [], _id: "" } as note);
+            let res = await noteStore.createNote({ title: noteObj, thoughts: [], id: "" } as note);
 
             // I'm pretty sure I should try/catch this
             statusMessage.value = "Successfully created note " + res.title;
@@ -37,7 +37,7 @@ export const useSearchStore = defineStore('search', () => {
             console.log("Selected note: ");
             console.log(noteObj);
             // console.log("Navigating to note: ", noteObj.title);
-            router.push({ path: `/note/${noteObj._id}` });
+            router.push({ path: `/note/${noteObj.id}` });
             // router.push({ path: "/note", query: { noteName:(newValue as string) } });
         }
     }

@@ -1,6 +1,4 @@
-import { forwardRef, Inject, Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import mongoose, { Model, ObjectId, Types } from "mongoose";
+import { BadRequestException, forwardRef, Inject, Injectable } from "@nestjs/common";
 import { MyFireStoreService } from "src/firebase/firebase.service";
 import { Thought } from "src/types/thought";
 import { CreateNoteDto } from "./dto/create-note.dto";
@@ -45,14 +43,14 @@ export class NoteService {
             return [];
         }
 
-        const filteredNotes = notesDoc.docs.filter(doc => doc.data().title.includes(title));
+        const filteredNotes = notesDoc.docs.filter(doc => doc.data().title.toLowerCase().includes(title.toLowerCase()));
 
         return filteredNotes.map(doc => new Note(doc.id, doc.data().title, doc.data().thoughts));        
     }
 
     // get
     async GetOne(id: string): Promise<Note> {
-        const doc = await this.notesDocRef.doc(id).get();
+        const doc = await this.firebaseService.db.collection("notes").doc(id).get();
 
         return new Note(doc.id, doc.data().title, doc.data().thoughts);
     }
@@ -70,22 +68,10 @@ export class NoteService {
         return note;
     }
 
-    // // // update one
-    // // async UpdateOne(id: mongoose.Types.ObjectId, title: string): Promise<Note> {
-
-    // //     let noteToUpdate = await this.noteModel.findById(id).exec();
-
-    // //     // even if it's the same, no harm done
-    // //     noteToUpdate.title = title;
-
-    // //     return await noteToUpdate.save();
-    // // }
-
     async RemoveThought(noteId:string, thoughtId: string): Promise<Note> {
+        const noteRef = await this.firebaseService.db.collection('notes').doc(noteId);
 
-        const noteRef = this.notesDocRef.doc(noteId);
-
-        if (!noteRef.exists)
+        if (!noteRef)
             return null;
 
         const removeRes = await noteRef.update({
@@ -98,7 +84,7 @@ export class NoteService {
         // get updated note
         const note = await noteRef.get();
 
-        return new Note(note.id, note.title, note.thoughts);
+        return new Note(note.id, note.data().title, note.data().thoughts);
     }
 
     async FindOneByThoughtId(thoughtId: string): Promise<Note> {
@@ -111,40 +97,44 @@ export class NoteService {
     }
 
     async RenameNote(id: string, newName: string): Promise<Note> {
+        const noteRef = this.firebaseService.db.collection('notes').doc(id);
 
-        const noteRef = this.notesDocRef.doc(id);
-
-        if (!noteRef.exists)
-            return null;
+        if (!noteRef)
+            throw new BadRequestException("Note not found");
 
         const renameRes = await noteRef.update({
             title: newName
         });
 
         if (renameRes === null)
-            return null;
+            throw new BadRequestException("Could not update note");
 
         // get updated note
         const note = await noteRef.get();
 
-        return new Note(note.id, note.title, note.thoughts);
+        return new Note(note.id, note.data().title, note.data().thoughts);
     }
 
     async AddThought(id: string, thoughtId: string): Promise<Note> {
-        // get the note by id
-        const noteRef = this.notesDocRef.doc(id);
+        const noteRef = this.firebaseService.db.collection('notes').doc(id);
 
-        if (!noteRef.exists)
+        if (!noteRef) {
+            console.log("Note not found");
             return null;
+        }
 
-        // Atomically add a new region to the "regions" array field.
         const unionRes = await noteRef.update({
             thoughts: FieldValue.arrayUnion(thoughtId)
         });
 
+        if (unionRes === null) {
+            console.log("Unable to update");
+            return null;
+        }
+
         // get updated note
         const note = await noteRef.get();
 
-        return new Note(note.id, note.title, note.thoughts);
+        return new Note(note.id, note.data().title, note.data().thoughts);
     }
 }

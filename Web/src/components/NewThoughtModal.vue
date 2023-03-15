@@ -111,14 +111,14 @@
         // id is useless, we only send content and noteId to the server haha
         // but we need it because of type thought
         let thoughtObject = { 
-            _id: "",
+            id: "",
             content: props.thought,
             noteId: ""};
 
         if (typeof newValue !== 'string') {
             // id or _id? We'll find out soon enough
             console.log("Got note: ", newValue);
-            thoughtObject.noteId = newValue._id;
+            thoughtObject.noteId = newValue.id;
             console.log("Sending thought: ", thoughtObject);
             await thoughtStore.createThought(thoughtObject);
         } else {

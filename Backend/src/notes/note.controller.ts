@@ -1,6 +1,5 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth } from "@nestjs/swagger";
-import { Types } from "mongoose";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { Thought } from "src/types/thought";
 import { CreateNoteDto } from "./dto/create-note.dto";

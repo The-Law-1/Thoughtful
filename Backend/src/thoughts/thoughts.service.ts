@@ -1,11 +1,8 @@
-import mongoose, { Model, Types } from "mongoose";
 import { BadRequestException, forwardRef, Inject, Injectable } from "@nestjs/common";
-import { InjectModel, Schema } from "@nestjs/mongoose";
 // import { Thought, ThoughtDocument } from "./schemas/thought.schema";
 import { Thought} from "../types/thought";
 import { CreateThoughtDto } from "./dto/create-thought.dto";
 import { NoteService } from "src/notes/note.service";
-import { Note, NoteDocument } from "src/notes/schemas/note.schema";
 import { UpdateThoughtDto } from "./dto/update-thought.dto";
 import { createCipheriv, createDecipheriv, randomBytes, scrypt } from 'crypto';
 import { promisify } from 'util';
@@ -82,7 +79,11 @@ export class ThoughtsService {
         );
 
         // add thought to note
-        await this.noteService.AddThought(createThoughtDto.noteId, res.id);
+        let addThoughtRes = await this.noteService.AddThought(createThoughtDto.noteId, res.id);
+
+        if (!addThoughtRes) {
+            throw new BadRequestException("Could not add thought to note " + createThoughtDto.noteId + " with id " + res.id);
+        }
 
         const createdThought = new Thought(res.id, createThoughtDto.content, createThoughtDto.noteId);
 
@@ -216,24 +217,30 @@ export class ThoughtsService {
 
     // update
     async UpdateOne(id: string, thought: UpdateThoughtDto): Promise<Thought> {
-        const thoughtRef = await this.thoughtsDocRef.doc(id);
+        // const thoughtRef = await this.thoughtsDocRef.doc(id);
+        const thoughtRef = await this.firebaseService.db.collection("thoughts").doc(id).get();
 
-        if (thoughtRef.empty)
+        if (!thoughtRef)
             return null;
         // * encrypt the content in updateThoughtDto
         thought.content = this.encrypt(thought.content);
 
-        thoughtRef.update({ content: thought.content, noteId: thought.noteId });
+        await thoughtRef.data().update({ content: thought.content, noteId: thought.noteId });
 
         return new Thought(id, thought.content, thought.noteId);
     }
 
     // delete one
     async DeleteOne(id: string): Promise<boolean> {
+
+        // find thought
+        const thoughtDoc = await this.thoughtsDocRef.doc(id).get();
+        const noteId = thoughtDoc.data().noteId;
+
         const res = await this.thoughtsDocRef.doc(id).delete();
 
         // delete it in the note
-        const deleteFromNoteRes = await this.noteService.RemoveThought(res.data().noteId, id);
+        const deleteFromNoteRes = await this.noteService.RemoveThought(noteId, id);
 
         return (res !== null && deleteFromNoteRes !== null) ? true : null;
 

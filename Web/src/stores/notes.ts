@@ -25,7 +25,7 @@ export const useNoteStore = defineStore('notes', () => {
     }
 
     async function updateNote(noteObj: note, updatedThoughts: thought[]): Promise<note> {
-        let updatedNote = await BackendPaths.Notes.UpdateNoteById(authStore.jwtToken, noteObj._id, noteObj, updatedThoughts);
+        let updatedNote = await BackendPaths.Notes.UpdateNoteById(authStore.jwtToken, noteObj.id, noteObj, updatedThoughts);
 
         return updatedNote;
     }

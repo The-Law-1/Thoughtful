@@ -18,11 +18,11 @@
                     v-for="(thought, i) in noteThoughts"
                     @click="() => clickThought(i)"
                     @focusThought="(idx) => focusThought(idx)"
-                    @thoughtUpdated="(val) => handleThoughtUpdated(thought._id, val)"
-                    @thoughtDeleted="(id) => deleteThought(thought._id)"
+                    @thoughtUpdated="(val) => handleThoughtUpdated(thought.id, val)"
+                    @thoughtDeleted="(id) => deleteThought(thought.id)"
                     @thoughtInserted="(idx) => insertThought(idx)"
                     :ref="'thought-' + i"
-                    :key="`thoughtkey-${thought._id}-${i}`"
+                    :key="`thoughtkey-${thought.id}-${i}`"
                     :focus-trigger="i === currentThoughtIndex ? focusTrigger : 0"
                     :note-name="note.title"
                     :thought-index="i"
@@ -67,20 +67,20 @@
 
     let exportNote = async () => {
         console.log("Exporting note");
-        await noteStore.exportNote(note.value._id);
+        await noteStore.exportNote(note.value.id);
     }
 
     let handleThoughtUpdated = (id:string, val:string) => {
         console.log("Thought updated: ", val);
 
-        let idx = thoughtsToUpdate.value.findIndex(t => t._id === id);
+        let idx = thoughtsToUpdate.value.findIndex(t => t.id === id);
         if (idx >= 0) {
             thoughtsToUpdate.value[idx].content = val;
         } else {
             thoughtsToUpdate.value.push({
-                _id: id,
+                id: id,
                 content: val,
-                noteId: note.value._id
+                noteId: note.value.id
             });
         }
     }
@@ -116,7 +116,7 @@
                 console.log("Thought deleted: ", res);
             });
 
-        let idx = noteThoughts.value.findIndex(t => t._id === id);
+        let idx = noteThoughts.value.findIndex(t => t.id === id);
 
         if (idx >= 0) {
             noteThoughts.value.splice(idx, 1);
@@ -130,11 +130,11 @@
 
         // this is making our note adding slow as hell, do it asynchronously
         thoughtStore.createThought({
-            _id: "",
+            id: "",
             content: "",
-            noteId: note.value._id
+            noteId: note.value.id
         }).then(res => {
-            noteThoughts.value[idx]._id = res._id;
+            noteThoughts.value[idx].id = res.id;
             note.value.thoughts = noteThoughts.value;
             focusThought(idx);
         })
@@ -150,9 +150,9 @@
 
         // make sure this went through
         noteThoughts.value.splice(idx, 0, {
-            _id: "",
+            id: "",
             content: "",
-            noteId: note.value._id
+            noteId: note.value.id
         });
         note.value.thoughts = noteThoughts.value;
 
@@ -165,9 +165,9 @@
             console.log("Adding new thought");
 
             let newThought = await thoughtStore.createThought({
-                _id: "",
+                id: "",
                 content: "",
-                noteId: note.value._id
+                noteId: note.value.id
             });
 
             // make sure this went through
