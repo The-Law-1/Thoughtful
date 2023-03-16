@@ -70,6 +70,6 @@ export const useSearchStore = defineStore('search', () => {
 })
 
 // make sure to pass the right store definition, `useAuth` in this case.
-if (import.meta.hot) {
-    import.meta.hot.accept(acceptHMRUpdate(useSearchStore, import.meta.hot))
-}
+// if (import.meta.hot) {
+//     import.meta.hot.accept(acceptHMRUpdate(useSearchStore, import.meta.hot))
+// }

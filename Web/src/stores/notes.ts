@@ -59,6 +59,6 @@ export const useNoteStore = defineStore('notes', () => {
 })
 
 // make sure to pass the right store definition, `useAuth` in this case.
-if (import.meta.hot) {
-    import.meta.hot.accept(acceptHMRUpdate(useNoteStore, import.meta.hot))
-}
+// if (import.meta.hot) {
+//     import.meta.hot.accept(acceptHMRUpdate(useNoteStore, import.meta.hot))
+// }

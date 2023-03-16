@@ -53,6 +53,6 @@ export const useThoughtStore = defineStore('thoughts', () => {
 });
 
 // make sure to pass the right store definition, `useAuth` in this case.
-if (import.meta.hot) {
-    import.meta.hot.accept(acceptHMRUpdate(useThoughtStore, import.meta.hot))
-}
+// if (import.meta.hot) {
+//     import.meta.hot.accept(acceptHMRUpdate(useThoughtStore, import.meta.hot))
+// }
