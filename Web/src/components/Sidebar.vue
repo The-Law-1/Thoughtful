@@ -29,7 +29,8 @@ import { MenuIcon, ChevronDoubleLeftIcon } from '@heroicons/vue/solid';
     let noteStore = useNoteStore();
 
     let sideBarItems = computed(() => {
-        return noteStore.getNoteNames;
+        return [];
+        // return noteStore.getNoteNames;
     });
     
     let isSidebarOpen = ref(navBarStore.$state.sidebarOpen);
