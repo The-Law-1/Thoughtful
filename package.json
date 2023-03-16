@@ -1,0 +1,13 @@
+{
+    "name": "cyclic-package-file",
+    "version": "0.1.0",
+    "description": "Cyclic package file",
+    "license": "MIT",
+    "private": true,
+    "scripts": {
+      "preinstall": "node -e \"JSON.parse(process.env.npm_config_argv)?.original?.[0] === 'add' && (console.log('\\x1b[31m' +'\\nYou\\'re on root, install packages only from the \\'nest\\' dir!\\n') ||  process.exit(-1))\"",
+      "install": "cd Backend && npm install",
+      "start": "cd Backend && npm start",
+      "build": "cd Backend && npm build"
+    }
+  }
