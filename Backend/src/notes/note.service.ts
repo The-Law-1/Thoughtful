@@ -16,7 +16,7 @@ export class NoteService {
 
     async create(createNoteDto: CreateNoteDto): Promise<Note> {
         const res = await this.notesDocRef.add(
-            createNoteDto
+            {...createNoteDto, createdAt: Date.now()}
         );
 
         return new Note(res.id, createNoteDto.title, createNoteDto.thoughts);

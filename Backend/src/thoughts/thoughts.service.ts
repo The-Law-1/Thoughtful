@@ -64,6 +64,9 @@ export class ThoughtsService {
         // * encrypt the content in createThoughtDto
         createThoughtDto.content = this.encrypt(createThoughtDto.content);
 
+        if (createThoughtDto.noteId.length == 0)
+            createThoughtDto.noteId = "default";
+
         const noteDoc = await this.notesDocRef.doc(createThoughtDto.noteId).get();
 
         if (!noteDoc.exists) {
@@ -75,7 +78,7 @@ export class ThoughtsService {
 
         // * create the thought
         const res = await this.thoughtsDocRef.add(
-            createThoughtDto
+            {...createThoughtDto, createdAt: Date.now()}
         );
 
         // add thought to note
@@ -124,6 +127,9 @@ export class ThoughtsService {
         }
 
         let thoughts = [];
+
+        // filter docs by ascending createdAt
+        thoughtsDoc.docs.sort((a, b) => a.data().createdAt - b.data().createdAt);
 
         for (const doc of thoughtsDoc.docs) {
             const thought = new Thought(doc.id, this.decrypt(doc.data().content), doc.data().noteId);
