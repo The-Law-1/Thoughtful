@@ -12,7 +12,8 @@ function safeJsonParse(str: string) {
 
 export default class BackendPath {
     // either you make a proxy or not, if you don't, this will read from environment variable
-    static readonly BASE_URL: string = "/api";
+    // static readonly BASE_URL: string = "/api";
+    static readonly BASE_URL: string = import.meta.env.VITE_BACKEND_URL || "/api";
 
     public static HelloWorld = class {
         static readonly PATH: string = `${BackendPath.BASE_URL}`;
@@ -68,6 +69,7 @@ export default class BackendPath {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    host: this.PATH,
                 },
                 body: JSON.stringify({ password }),
             })
@@ -79,6 +81,7 @@ export default class BackendPath {
                 } as Error);
             }
             return await res.text();
+            return "test";
         }
     }
 

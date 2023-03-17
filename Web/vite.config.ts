@@ -7,7 +7,7 @@ export default ({ mode }) => {
     process.env = {...process.env, ...loadEnv(mode, process.cwd())};
 
     return defineConfig({
-      base: "/Thoughtful/",
+    //   base: "/Thoughtful/",
     
       plugins: [vue()],
       resolve: {
@@ -19,7 +19,7 @@ export default ({ mode }) => {
         port: 3000,
         proxy: {
           "^/api": {
-            target: process.env.BACKEND_URL || "http://localhost:8080",
+            target: process.env.VITE_BACKEND_URL || "http://localhost:8080",
             ws: true,
             rewrite: (path) => path.replace("/api", ""),
           },

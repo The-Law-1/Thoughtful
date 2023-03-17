@@ -31,7 +31,7 @@ export const useAuthStore = defineStore("auth", () => {
 
             return true;
         } catch (e) {
-            console.log("Bad password");
+            console.log("Bad password: ", e);
             jwtToken.value = null;
             return false;
         }
