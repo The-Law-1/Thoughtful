@@ -39,6 +39,7 @@ async function bootstrap() {
         .addBearerAuth()
 		.build();
 
+    // * really you want to get a hold of your vercel frontend url here + localhost:3000
     app.enableCors({
         origin: "*",
         credentials: true
