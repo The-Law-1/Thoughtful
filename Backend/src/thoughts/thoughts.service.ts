@@ -12,7 +12,8 @@ import { MyFireStoreService } from "src/firebase/firebase.service";
 @Injectable()
 export class ThoughtsService {
 
-    iv = randomBytes(16);
+    // iv = randomBytes(16);
+    iv = "iv";
     encryptionPassword = 'Password used to generate key';
     key = null as Buffer;
 
@@ -23,6 +24,8 @@ export class ThoughtsService {
         private noteService: NoteService, private firebaseService: MyFireStoreService) {
 
             this.encryptionPassword = process.env.ENCRYPTION_PASSWORD;
+
+            this.iv = process.env.ENCRYPTION_IV;
 
             this.thoughtsDocRef = firebaseService.db.collection('thoughts');
             this.notesDocRef = firebaseService.db.collection('notes');
